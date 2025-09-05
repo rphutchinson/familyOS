@@ -2,24 +2,25 @@
 
 import { useState } from "react";
 import { Plus, ExternalLink, Users, Settings, Zap } from "lucide-react";
+import Link from "next/link";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { useProviders } from "@/hooks/use-providers";
-import { useFamilyMembers } from "@/hooks/use-family-members";
+import { useFamilyStore } from "@/lib/stores/family-store";
 import { Provider, FamilyMember } from "@/types";
 
 export default function Home() {
-  const { providers, groupProvidersByFamily, markProviderAccessed } = useProviders();
-  const { familyMembers } = useFamilyMembers();
+  const { familyMembers } = useFamilyStore();
   const [showAddProvider, setShowAddProvider] = useState(false);
-  const [showManageFamily, setShowManageFamily] = useState(false);
 
-  // Sample data for demo when no real data exists
+  // TODO: Replace with actual provider store when implemented
+  const providers: Provider[] = []; // Empty for now until provider management is built
+
+  // Sample data for demo when no real data exists  
   const sampleFamilyMembers: FamilyMember[] = [
-    { id: "self", name: "Me", relationship: "Self", color: "#3b82f6", isDefault: true },
-    { id: "spouse", name: "Sarah", relationship: "Spouse", color: "#ef4444" },
-    { id: "child1", name: "Emma", relationship: "Child", color: "#22c55e" }
+    { id: "self", name: "Me", relationship: "Self", color: "#3b82f6", isDefault: true, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    { id: "spouse", name: "Sarah", relationship: "Spouse", color: "#ef4444", isDefault: false, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    { id: "child1", name: "Emma", relationship: "Child", color: "#22c55e", isDefault: false, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() }
   ];
 
   const sampleProviders: Provider[] = [
@@ -50,7 +51,7 @@ export default function Home() {
   ];
 
   // Use real data if available, otherwise show demo data
-  const displayFamilyMembers = familyMembers.length > 1 ? familyMembers : sampleFamilyMembers;
+  const displayFamilyMembers = familyMembers.length > 0 ? familyMembers : sampleFamilyMembers;
   const displayProviders = providers.length > 0 ? providers : sampleProviders;
 
   // Group providers by family member
@@ -62,7 +63,7 @@ export default function Home() {
   })).filter(group => group.providers.length > 0);
 
   const handlePortalClick = (provider: Provider) => {
-    markProviderAccessed(provider.id);
+    // TODO: Implement markProviderAccessed when provider store is built
     window.open(provider.portalUrl, '_blank');
   };
 
@@ -81,9 +82,11 @@ export default function Home() {
           </div>
           
           <div className="flex gap-2">
-            <Button variant="outline" onClick={() => setShowManageFamily(true)}>
-              <Users className="h-4 w-4 mr-2" />
-              Manage Family
+            <Button variant="outline" asChild>
+              <Link href="/family">
+                <Users className="h-4 w-4 mr-2" />
+                Manage Family
+              </Link>
             </Button>
             <Button onClick={() => setShowAddProvider(true)}>
               <Plus className="h-4 w-4 mr-2" />
@@ -196,9 +199,11 @@ export default function Home() {
               Start by adding family members and their healthcare providers to organize portal access.
             </p>
             <div className="flex gap-2 justify-center">
-              <Button variant="outline" onClick={() => setShowManageFamily(true)}>
-                <Users className="h-4 w-4 mr-2" />
-                Add Family Members
+              <Button variant="outline" asChild>
+                <Link href="/family">
+                  <Users className="h-4 w-4 mr-2" />
+                  Add Family Members
+                </Link>
               </Button>
               <Button onClick={() => setShowAddProvider(true)}>
                 <Plus className="h-4 w-4 mr-2" />

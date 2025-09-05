@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { MainNav } from "@/components/main-nav";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -13,8 +14,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Healthcare Portal Organizer",
-  description: "Personal healthcare provider portal organizer and bookmark manager",
+  title: "Family Healthcare Portal Organizer",
+  description: "Personal healthcare provider portal organizer for families",
 };
 
 export default function RootLayout({
@@ -27,7 +28,8 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {children}
+        <MainNav />
+        <main>{children}</main>
       </body>
     </html>
   );
