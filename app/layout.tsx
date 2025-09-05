@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Healthcare Dashboard",
-  description: "Provider management system for healthcare organizations",
+  title: "Healthcare Portal Organizer",
+  description: "Personal healthcare provider portal organizer and bookmark manager",
 };
 
 export default function RootLayout({

@@ -1,245 +1,302 @@
-# Healthcare Dashboard - CLAUDE.md
+# Family Healthcare Portal Organizer - CLAUDE.md
 
-This documentation serves as a comprehensive reference for understanding the healthcare dashboard project architecture and development workflow.
+This documentation serves as a comprehensive reference for the family-focused healthcare portal organizer project.
 
 ## Project Overview
 
-The Healthcare Dashboard is a modern provider management system built for healthcare organizations. It provides an intuitive interface for managing healthcare providers, tracking patient appointments, and monitoring key performance metrics.
+The Family Healthcare Portal Organizer is a personal productivity tool designed to organize healthcare provider portals for you and your family members. It serves as an intelligent bookmark manager that groups providers by family member and provides quick access to patient portals.
 
 **Key Features:**
-- 🏥 **Provider Management** - Comprehensive provider tracking and status management
-- 📅 **Appointment Scheduling** - Real-time appointment monitoring and management  
-- 📊 **Analytics Dashboard** - Key metrics and performance indicators
-- 🎨 **Modern UI** - Clean, responsive design with shadcn/ui components
-- 🌙 **Dark Mode Support** - Built-in light/dark theme switching
-- 📱 **Mobile Responsive** - Optimized for all device sizes
+- 👪 **Family Member Management** - Add/edit/delete family members (John, Jane, Kids, etc.)
+- 🏥 **Provider Organization** - Each provider can be associated with one or more family members
+- 🔗 **Grouped Portal Access** - Dashboard shows providers organized by family member
+- ⚡ **Quick Add** - Intelligent portal detection for easy addition of new providers
+- 💾 **Local Storage Only** - All data stored locally, no accounts or cloud sync needed
+- 🎨 **Clean Family Dashboard** - Color-coded family groups with provider counts
+- 📱 **One-Click Portal Access** - Direct links to patient portals with usage tracking
 
 ## Tech Stack
 
 - **Framework:** Next.js 15.5.2 with App Router and Turbopack
 - **Language:** TypeScript with strict mode
 - **Styling:** Tailwind CSS v4 with CSS variables
-- **UI Components:** shadcn/ui (New York style)
+- **UI Components:** shadcn/ui (New York style) - minimal set
 - **Icons:** Lucide React
 - **Fonts:** Geist Sans & Geist Mono
-- **State Management:** Custom React hooks with local state
-- **Animation:** tw-animate-css for enhanced animations
+- **Storage:** Browser localStorage (no backend needed)
+- **State Management:** Simple React hooks with localStorage persistence
 
 ## Folder Structure
 
 ```
-healthcare-dashboard/
+healthcare-portal-organizer/
 ├── app/                    # Next.js App Router pages
 │   ├── globals.css        # Global styles with Tailwind v4
 │   ├── layout.tsx         # Root layout with fonts and metadata
-│   └── page.tsx           # Dashboard homepage
+│   └── page.tsx           # Main portal organizer page
 ├── components/            # React components
-│   ├── ui/               # shadcn/ui base components
-│   │   ├── button.tsx    # Button variations
-│   │   ├── card.tsx      # Card components
-│   │   ├── badge.tsx     # Status badges
-│   │   ├── avatar.tsx    # User avatars
-│   │   ├── sidebar.tsx   # Sidebar navigation
-│   │   └── [other-ui]    # Additional UI primitives
-│   └── dashboard-layout.tsx # Main dashboard layout wrapper
+│   └── ui/               # shadcn/ui base components (minimal set)
+│       ├── button.tsx    # Button variations
+│       ├── card.tsx      # Card components for provider display
+│       ├── badge.tsx     # Family member badges
+│       ├── avatar.tsx    # User avatars (optional)
+│       └── input.tsx     # Form inputs for adding providers
 ├── hooks/                 # Custom React hooks
 │   ├── use-mobile.ts     # Mobile breakpoint detection
-│   └── use-providers.ts  # Provider data management
+│   └── use-providers.ts  # Provider CRUD with localStorage
 ├── lib/                  # Utilities and helpers
-│   └── utils.ts          # Common utility functions (cn, formatDate, formatPhoneNumber)
+│   └── utils.ts          # Common utility functions (cn, etc.)
 ├── types/                # TypeScript interfaces
-│   └── index.ts          # Core type definitions
-├── public/               # Static assets
-├── components.json       # shadcn/ui configuration
-├── tsconfig.json        # TypeScript configuration
-└── package.json         # Dependencies and scripts
+│   └── index.ts          # Provider and FamilyMember interfaces
+└── [config files]       # Next.js, TypeScript, Tailwind configs
 ```
-
-## Key Components
-
-### DashboardLayout (`components/dashboard-layout.tsx`)
-Main layout component providing:
-- **Sidebar Navigation:** Fixed navigation with icons and badges
-- **Header:** Top bar with system status and user info
-- **Content Area:** Main content wrapper with proper spacing
-- **Responsive Design:** Mobile-first with collapsible sidebar
-
-Navigation items include:
-- Dashboard (Home)
-- Providers (with badge count)
-- Appointments (with notification count)
-- Analytics
-- Settings
-
-### UI Components (`components/ui/`)
-Based on shadcn/ui with customizations:
-- **Card Components:** Used for dashboard widgets and content sections
-- **Badge Components:** Status indicators with semantic variants
-- **Avatar Components:** User profile images with fallbacks
-- **Sidebar Components:** Navigation structure with proper accessibility
-- **Button Components:** Multiple variants and sizes
-- **Input Components:** Form controls with consistent styling
 
 ## Data Models
 
 ### Core Interfaces (`types/index.ts`)
 
 ```typescript
-// Provider entity - core healthcare provider data
+// Family member with personalization options
+interface FamilyMember {
+  id: string                   // Unique identifier
+  name: string                 // Display name ("John", "Jane", "Emma", "Dad")
+  relationship: string         // "Self", "Spouse", "Child", "Parent"
+  color?: string              // Optional color for visual grouping
+  isDefault?: boolean         // Mark primary family member (usually "Self")
+}
+
+// Enhanced provider model with family associations
 interface Provider {
-  id: string
-  name: string
-  specialty: string
-  email: string
-  phone: string
-  status: 'active' | 'inactive' | 'pending'
-  joinDate: string
-  patientsCount: number
+  id: string                    // Unique identifier
+  name: string                  // Provider name ("Dr. Johnson", "City Dental Group")
+  specialty: string             // Medical specialty ("Primary Care", "Dentistry")
+  portalUrl: string            // Direct link to patient portal login
+  portalPlatform: string       // Portal platform ("MyChart", "Epic", "Cerner")
+  familyMemberIds: string[]    // Array of family member IDs this provider serves
+  notes?: string               // Optional notes about provider
+  username?: string            // Optional portal username hint (no passwords!)
+  lastAccessed?: string        // ISO date string of last portal access
+  quickAddData?: QuickAddData  // Data from quick-add detection
 }
 
-// Patient entity - patient information
-interface Patient {
-  id: string
-  name: string
-  dateOfBirth: string
-  providerId: string
-  lastVisit: string
-  status: 'active' | 'inactive'
+// Quick-add detection metadata
+interface QuickAddData {
+  detectedPlatform?: string    // Auto-detected portal platform
+  siteName?: string           // Extracted site name
+  favicon?: string            // Provider favicon URL
+  autoDetected: boolean       // Whether this was auto-detected vs manual
 }
 
-// Dashboard metrics for overview display
-interface DashboardStats {
-  totalProviders: number
-  activeProviders: number
-  totalPatients: number
-  appointmentsToday: number
-}
-
-// Navigation configuration
-interface NavItem {
-  title: string
-  href: string
-  icon?: React.ComponentType<{ className?: string }>
-  badge?: string
+// UI organization helpers
+interface FamilyGroup {
+  familyMember: FamilyMember   // Family member info
+  providers: Provider[]        // Providers associated with this family member
 }
 ```
 
 ## State Management
 
-### Custom Hooks Pattern
-The application uses custom React hooks for state management rather than external state management libraries:
+### localStorage Pattern
+The application uses a simple localStorage pattern for data persistence:
 
-#### `useProviders` Hook (`hooks/use-providers.ts`)
-Manages provider data with full CRUD operations:
-
+#### Family Member Management (`hooks/use-family-members.ts`)
 ```typescript
 const {
-  providers,      // Provider[] - current provider list
-  loading,        // boolean - loading state
-  error,          // string | null - error state
-  addProvider,    // (provider: Omit<Provider, 'id'>) => void
-  updateProvider, // (id: string, updates: Partial<Provider>) => void
-  deleteProvider  // (id: string) => void
+  familyMembers,        // FamilyMember[] - current family member list
+  addFamilyMember,      // (member: Omit<FamilyMember, 'id'>) => void
+  updateFamilyMember,   // (id: string, updates: Partial<FamilyMember>) => void
+  deleteFamilyMember,   // (id: string) => boolean
+  getFamilyMember,      // (id: string) => FamilyMember | undefined
+  getDefaultFamilyMember // () => FamilyMember
+} = useFamilyMembers()
+```
+
+#### Provider Management (`hooks/use-providers.ts`)
+```typescript
+const {
+  providers,                  // Provider[] - current provider list
+  addProvider,               // (provider: Omit<Provider, 'id'>) => void
+  updateProvider,            // (id: string, updates: Partial<Provider>) => void
+  deleteProvider,            // (id: string) => void
+  getProvidersByFamilyMember, // (familyMemberId: string) => Provider[]
+  groupProvidersByFamily,    // (familyMembers: FamilyMember[]) => FamilyGroup[]
+  markProviderAccessed,      // (id: string) => void - tracks portal usage
+  quickAddProvider           // (url: string, detectedData?: any) => void
 } = useProviders()
 ```
 
-**Features:**
-- Mock data simulation with 1-second delay
-- Optimistic updates for better UX
-- Error handling for failed operations
-- Type-safe CRUD operations
+**Enhanced Features:**
+- Family member associations with many-to-many relationships
+- Portal usage tracking (last accessed timestamps)
+- Quick-add support for browser integration
+- Grouped organization for family-based UI display
 
-#### `useMobile` Hook (`hooks/use-mobile.ts`)
-Provides responsive breakpoint detection for mobile-first design.
+## UI Components
 
-## Styling Conventions
+### Provider Cards
+The main interface consists of provider cards that display:
+- **Provider Name** - Doctor or facility name
+- **Specialty** - Medical specialty or service type
+- **Portal Platform** - Which portal system they use
+- **Family Member Badge** - Who this provider is for
+- **Quick Access Button** - Opens portal in new tab
+- **Optional Notes** - Any additional information
 
-### Tailwind CSS v4 Configuration
-- **CSS Variables:** Custom properties for theming support
-- **Color System:** Semantic color tokens with light/dark variants
-- **Typography:** Geist font family integration
-- **Spacing:** Consistent spacing scale
-- **Border Radius:** Customizable radius system (`--radius: 0.625rem`)
+### Minimal Component Set
+Only essential shadcn/ui components are included:
+- `Card` - For provider display
+- `Button` - For actions and portal access
+- `Badge` - For family member indicators
+- `Input` - For add/edit forms (future)
+- `Avatar` - For user representation (optional)
 
-### Component Styling Patterns
-- **Conditional Classes:** Use `cn()` utility for merging Tailwind classes
-- **Responsive Design:** Mobile-first approach with `md:` and `lg:` breakpoints
-- **Color Semantics:** 
-  - `text-muted-foreground` for secondary text
-  - `bg-background` and `text-foreground` for base colors
-  - Status colors: `text-green-600` for success states
-- **Layout Patterns:** `space-y-*` for vertical spacing, `grid gap-4` for layouts
+## Key Features
 
-### shadcn/ui Integration
-- **New York Style:** Clean, modern aesthetic
-- **CSS Variables:** Full theming support
-- **Component Variants:** Use `variant` props for different styles
-- **Accessibility:** Built-in ARIA attributes and keyboard navigation
+### Family Member Management
+- **Personalized Family Members:** Add custom names like "John", "Sarah", "Emma" instead of generic "Spouse", "Child"
+- **Color-Coded Organization:** Each family member gets a unique color for visual grouping
+- **Flexible Relationships:** Support for Self, Spouse, Child, Parent, and custom relationships
+- **Default Member Protection:** Prevent accidental deletion of primary family member
+
+### Provider-Family Associations
+- **Many-to-Many Relationships:** Providers can serve multiple family members (e.g., family dentist)
+- **Grouped Dashboard View:** Providers organized by family member with counts
+- **Shared Provider Detection:** Visual indicators when providers serve multiple family members
+
+### Quick Add System
+- **Intelligent Portal Detection:** Automatic detection of healthcare portals from URLs
+- **Browser Integration Options:** 
+  - Bookmarklet approach for current page detection
+  - Browser extension manifest included for future development
+  - URL analysis for manual entry
+- **Platform Recognition:** Automatic identification of MyChart, Epic, Cerner, and other common platforms
+- **Confidence Scoring:** Algorithm assigns confidence scores to portal detection
+
+### Enhanced Portal Access
+- **Usage Tracking:** Track when portals were last accessed
+- **Username Hints:** Optional storage of usernames (never passwords)
+- **Auto-Detection Badges:** Visual indicators for quick-added vs manually entered providers
+- **Platform-Specific Icons:** Different visual treatment based on portal platform
+
+## Quick Add Implementation
+
+### Portal Detection Algorithm (`lib/portal-detection.ts`)
+The quick-add system uses pattern matching to detect healthcare portals:
+
+```typescript
+// Platform detection patterns
+const PORTAL_PATTERNS = {
+  'MyChart': [/mychart/i, /epic/i, /chart\..*\.com/i],
+  'Epic': [/epic/i, /myepic/i, /epicmychart/i],
+  'Cerner': [/cerner/i, /powerchart/i, /healthelife/i],
+  'athenahealth': [/athenahealth/i, /athenacollector/i],
+  // ... more platforms
+};
+
+// Healthcare keyword detection
+const HEALTHCARE_KEYWORDS = [
+  'health', 'medical', 'clinic', 'hospital', 'patient',
+  'care', 'wellness', 'doctor', 'physician', 'therapy'
+];
+```
+
+### Integration Approaches
+
+#### 1. Bookmarklet Approach (Current)
+- **Simple Implementation:** JavaScript bookmarklet detects current page
+- **Cross-Browser:** Works in all modern browsers
+- **User-Friendly:** Drag-and-drop installation
+- **Privacy-Focused:** No permissions required
+
+```javascript
+javascript:(function(){
+  const url = window.location.href;
+  const title = document.title;
+  const isHealthcare = /health|medical|patient|portal/i.test(url + ' ' + title);
+  if (isHealthcare) {
+    window.open('http://localhost:3001?quickadd=' + encodeURIComponent(url));
+  }
+})();
+```
+
+#### 2. Browser Extension (Future)
+- **Enhanced Detection:** Access to page content and metadata
+- **Background Processing:** Continuous portal detection
+- **Permissions Required:** activeTab permission needed
+- **Store Distribution:** Requires Chrome Web Store / Firefox Add-ons approval
+
+#### 3. URL Analysis Tool
+- **Manual Entry:** User pastes URL for analysis
+- **Batch Processing:** Analyze multiple URLs at once
+- **No Browser Integration:** Works entirely within the app
+
+### Detection Confidence Scoring
+The system assigns confidence scores (0-1) based on:
+- **Pattern Matches:** Higher score for known portal patterns
+- **Healthcare Keywords:** Incremental score for medical terms
+- **Domain Analysis:** Subdomain and path analysis
+- **Meta Tags:** OpenGraph and application name detection
 
 ## Development Workflow
 
-### Adding New Features
-1. **Plan the Feature:** Identify data models and UI requirements
-2. **Create Types:** Add TypeScript interfaces in `types/index.ts`
-3. **Build Components:** Start with UI components in `components/ui/`
-4. **Add Custom Hooks:** Create state management hooks in `hooks/`
-5. **Create Pages:** Add pages in `app/` directory
-6. **Test Integration:** Verify responsive design and accessibility
+### Adding Family Members
+1. **Default Setup:** App starts with "Me" as default family member
+2. **Custom Names:** Users add personalized names instead of relationships
+3. **Color Assignment:** Each member gets unique color for visual distinction
+4. **Protection Logic:** Default member cannot be deleted
 
-### Adding New Components
-1. **Check Existing:** Review similar components for patterns
-2. **Use shadcn/ui:** Leverage existing UI primitives
-3. **Follow Conventions:** Match naming and structure patterns
-4. **Add TypeScript:** Include proper type definitions
-5. **Implement Responsiveness:** Ensure mobile-first design
+### Adding Providers
+1. **Manual Entry:** Traditional form with name, specialty, URL, platform
+2. **Quick Add:** Portal detection from current browser tab
+3. **Family Assignment:** Multi-select which family members this provider serves
+4. **Auto-Detection:** Platform and metadata automatically filled when possible
 
-### State Management Pattern
-1. **Local State First:** Use `useState` for component-specific data
-2. **Custom Hooks:** Extract reusable state logic
-3. **Mock Data:** Use realistic mock data during development
-4. **Error Handling:** Include loading and error states
-5. **Type Safety:** Maintain strict TypeScript compliance
+### Family-Based Organization
+1. **Grouped Display:** Providers organized under family member headings
+2. **Color Coding:** Family member colors used throughout interface
+3. **Provider Counts:** Show number of providers per family member
+4. **Shared Indicators:** Visual cues when providers serve multiple members
 
-## Code Standards
+## Styling Conventions
 
-### Naming Conventions
-- **Components:** PascalCase (e.g., `DashboardLayout`, `ProviderCard`)
-- **Hooks:** camelCase with `use` prefix (e.g., `useProviders`, `useMobile`)
-- **Files:** kebab-case for components, camelCase for utilities
-- **Variables:** camelCase for local variables, UPPER_CASE for constants
+### Simple Design System
+- **Card-Based Layout:** Each provider gets a clean card
+- **Consistent Spacing:** Standard padding and margins
+- **Readable Typography:** Clear hierarchy with provider names prominent
+- **Color Coding:** Subtle colors for family member categories
+- **Mobile-First:** Responsive grid layout
 
-### File Organization
-- **Single Responsibility:** One main component per file
-- **Export Pattern:** Default export for main component, named exports for utilities
-- **Import Order:** External libraries, internal components, types, utilities
-- **Path Aliases:** Use `@/` prefix for absolute imports
+### shadcn/ui Integration
+- **Minimal Set:** Only necessary components included
+- **Clean Aesthetic:** Focus on usability over complex design
+- **Consistent Variants:** Use standard button and badge variants
 
-### TypeScript Standards
-- **Strict Mode:** All TypeScript strict options enabled
-- **Interface Definitions:** Prefer interfaces over types for object shapes
-- **Optional Properties:** Use `?` for optional fields
-- **Generic Types:** Use generics for reusable components
-- **Type Guards:** Implement proper type checking
+## Use Cases
 
-## Key Dependencies
+### Primary Use Cases
+1. **Portal Bookmark Manager:** Replace scattered bookmarks with organized cards
+2. **Family Healthcare Organization:** Separate providers by family member
+3. **Quick Access:** One-click access to patient portals
+4. **Provider Information:** Keep specialty and platform info organized
 
-### Core Dependencies
-- **next**: ^15.5.2 - React framework with App Router
-- **react**: ^19.1.0 - Core React library
-- **typescript**: ^5 - Type safety and developer experience
+### Not Designed For
+- **Medical Records Management:** This is NOT for storing medical data
+- **Appointment Scheduling:** Links to portals, doesn't manage appointments
+- **Multi-User Systems:** Personal tool, not for sharing
+- **Complex Workflows:** Simple organization only
 
-### UI & Styling
-- **tailwindcss**: ^4 - Utility-first CSS framework
-- **@radix-ui/react-***: Headless UI primitives for accessibility
-- **lucide-react**: ^0.542.0 - Beautiful SVG icons
-- **class-variance-authority**: ^0.7.1 - Component variant management
-- **clsx**: ^2.1.1 - Conditional className utility
-- **tailwind-merge**: ^3.3.1 - Tailwind class merging
+## Security & Privacy
 
-### Development Tools
-- **eslint**: ^9 - Code linting and formatting
-- **@tailwindcss/postcss**: ^4 - PostCSS integration
-- **tw-animate-css**: ^1.3.8 - Enhanced animations
+### Data Handling
+- **Local Storage Only:** No data leaves the device
+- **No Authentication:** No accounts or login required
+- **No Medical Data:** Only portal access information stored
+- **Browser-Based:** Data tied to specific browser/device
+
+### Best Practices
+- **URL Validation:** Basic validation of portal URLs
+- **No Sensitive Data:** Avoid storing usernames/passwords
+- **Local Only:** Emphasize data stays on device
 
 ## Development Commands
 
@@ -247,7 +304,7 @@ Provides responsive breakpoint detection for mobile-first design.
 # Development server with Turbopack
 npm run dev
 
-# Production build with Turbopack  
+# Production build
 npm run build
 
 # Production server
@@ -257,91 +314,22 @@ npm start
 npm run lint
 ```
 
-## Best Practices
+## Future Enhancements
 
-### Performance
-- **Turbopack:** Leverages Next.js's fast bundler for development
-- **App Router:** Uses React Server Components for optimal performance
-- **Image Optimization:** Next.js automatic image optimization
-- **Font Optimization:** Automatic font loading and optimization
+### Potential Features
+- **Add Provider Form:** Modal or page for adding new providers
+- **Edit/Delete:** Provider management functionality
+- **Search/Filter:** Find providers by name or specialty
+- **Export/Import:** JSON backup/restore functionality
+- **Usage Tracking:** Track which portals are accessed most
+- **Portal Categories:** Group by type (medical, dental, vision, etc.)
 
-### Accessibility
-- **Semantic HTML:** Use proper heading hierarchy and landmarks
-- **ARIA Labels:** Include descriptive labels for interactive elements
-- **Keyboard Navigation:** Ensure all functionality is keyboard accessible
-- **Color Contrast:** Maintain proper contrast ratios
-- **Focus Management:** Proper focus indicators and management
-
-### Code Quality
-- **TypeScript Strict:** No implicit any, strict null checks
-- **ESLint Rules:** Consistent code formatting and best practices
-- **Component Composition:** Prefer composition over inheritance
-- **Pure Functions:** Write side-effect-free utility functions
-- **Error Boundaries:** Implement proper error handling strategies
-
-## Auto-Documentation System
-
-This project includes an automated documentation maintenance system that keeps CLAUDE.md up-to-date with architectural changes.
-
-### Pre-commit Hook
-
-A git pre-commit hook (`.git/hooks/pre-commit`) automatically:
-
-1. **Analyzes Staged Changes** - Examines git diff of staged files
-2. **Detects Architectural Changes** - Uses pattern matching and Claude Code CLI analysis to identify:
-   - New dependencies or package.json changes
-   - New components, hooks, or utilities  
-   - Changes to project structure or folder organization
-   - New TypeScript interfaces or type definitions
-   - Configuration changes (Tailwind, Next.js, TypeScript, etc.)
-   - New imports from external libraries
-   - Changes to global styles or layout components
-
-3. **Smart Filtering** - Skips updates for non-architectural changes like:
-   - Bug fixes or logic improvements
-   - Styling tweaks or CSS adjustments
-   - Code refactoring without structural changes
-   - Minor text or content updates
-   - Variable renaming or code cleanup
-
-4. **Automatic Updates** - When architectural changes are detected:
-   - Uses Claude Code CLI to update relevant CLAUDE.md sections
-   - Automatically stages the updated documentation
-   - Allows the commit to proceed
-
-### Manual Documentation Update
-
-For manual updates or when the pre-commit hook isn't available:
-
-```bash
-# Using npm script
-npm run update-docs
-
-# Or directly
-./scripts/update-docs.sh
-```
-
-The manual update script:
-- Analyzes the current project state
-- Updates CLAUDE.md based on actual project files
-- Provides colored output for status updates
-- Requires Claude Code CLI to be installed
-
-### Requirements
-
-- **Claude Code CLI** must be installed and accessible in PATH
-- Hook gracefully degrades if CLI is not available
-- Both automatic and manual systems include error handling
-
-### How It Works
-
-1. **Change Detection**: Pattern matching identifies potential architectural changes
-2. **Claude Analysis**: Uses AI to determine if changes warrant documentation updates
-3. **Selective Updates**: Only updates relevant sections of CLAUDE.md
-4. **Automatic Staging**: Updated documentation is automatically added to the commit
-
-This system ensures documentation stays current without manual maintenance overhead while being smart enough to avoid unnecessary updates for minor code changes.
+### Not Planned
+- **User Accounts:** Keep it simple and local
+- **Cloud Sync:** Privacy-focused, local-only approach
+- **Complex State:** Avoid over-engineering
+- **Medical Data Integration:** Stay focused on portal organization
 
 ---
 
-This documentation is automatically maintained by the pre-commit hook system. When adding new features or making architectural changes, the relevant sections will be updated automatically during the commit process.
+This is a personal productivity tool focused on simplifying healthcare portal access. It's intentionally simple, private, and focused on the specific use case of organizing portal bookmarks for individuals and families.
