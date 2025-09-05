@@ -1,4 +1,32 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Healthcare Dashboard
+
+A modern healthcare provider management system built with Next.js 15, TypeScript, and shadcn/ui. This dashboard provides an intuitive interface for managing healthcare providers, tracking patient appointments, and monitoring key metrics.
+
+## Features
+
+- 🏥 **Provider Management** - Comprehensive provider tracking and status management
+- 📅 **Appointment Scheduling** - Real-time appointment monitoring and management  
+- 📊 **Analytics Dashboard** - Key metrics and performance indicators
+- 🎨 **Modern UI** - Clean, responsive design with shadcn/ui components
+- 🌙 **Dark Mode Support** - Built-in light/dark theme switching
+- 📱 **Mobile Responsive** - Optimized for all device sizes
+
+## Tech Stack
+
+- **Framework:** Next.js 15.5.2 with App Router
+- **Language:** TypeScript
+- **Styling:** Tailwind CSS v4
+- **Components:** shadcn/ui
+- **Icons:** Lucide React
+- **Development:** Turbopack for fast builds
+
+## Developer Tools
+
+This project includes enhanced developer experience tools:
+
+- 🤖 **AI-Powered Commits** - Use `git ai-commit` to generate conventional commit messages
+- 📖 **Auto-Documentation** - Pre-commit hooks automatically update CLAUDE.md
+- 🔧 **Manual Doc Updates** - Run `npm run update-docs` to refresh documentation
 
 ## Getting Started
 
