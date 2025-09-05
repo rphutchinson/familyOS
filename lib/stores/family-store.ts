@@ -1,21 +1,33 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import { FamilyMember, FamilyRelationship, FAMILY_COLORS } from '@/types';
+import { FamilyMember, FamilyRelationship, FAMILY_COLORS, HealthcareProvider, FamilyGroup } from '@/types';
 
 interface FamilyState {
   familyMembers: FamilyMember[];
+  providers: HealthcareProvider[];
   
-  // Actions
+  // Family Member Actions
   addFamilyMember: (member: Omit<FamilyMember, 'id' | 'createdAt' | 'updatedAt'>) => void;
   updateFamilyMember: (id: string, updates: Partial<Omit<FamilyMember, 'id' | 'createdAt' | 'updatedAt'>>) => void;
   deleteFamilyMember: (id: string) => boolean;
   getFamilyMember: (id: string) => FamilyMember | undefined;
   getDefaultFamilyMember: () => FamilyMember | undefined;
   getAvailableColor: () => string;
-  
-  // Utility functions
   reorderFamilyMembers: (fromIndex: number, toIndex: number) => void;
   setDefaultFamilyMember: (id: string) => void;
+  
+  // Provider Actions
+  addProvider: (provider: Omit<HealthcareProvider, 'id' | 'createdAt' | 'updatedAt'>) => void;
+  updateProvider: (id: string, updates: Partial<Omit<HealthcareProvider, 'id' | 'createdAt' | 'updatedAt'>>) => void;
+  deleteProvider: (id: string) => void;
+  getProvider: (id: string) => HealthcareProvider | undefined;
+  getProvidersByFamilyMember: (familyMemberId: string) => HealthcareProvider[];
+  groupProvidersByFamily: () => FamilyGroup[];
+  markProviderUsed: (id: string) => void;
+  
+  // Utility functions
+  getProvidersForMultipleMembers: () => HealthcareProvider[];
+  searchProviders: (query: string) => HealthcareProvider[];
 }
 
 const DEFAULT_FAMILY_MEMBER: Omit<FamilyMember, 'id' | 'createdAt' | 'updatedAt'> = {
@@ -29,6 +41,7 @@ export const useFamilyStore = create<FamilyState>()(
   persist(
     (set, get) => ({
       familyMembers: [],
+      providers: [],
 
       addFamilyMember: (member) => {
         const now = new Date().toISOString();
@@ -113,10 +126,85 @@ export const useFamilyStore = create<FamilyState>()(
             updatedAt: new Date().toISOString()
           }))
         }));
+      },
+
+      // Provider Management Methods
+      addProvider: (provider) => {
+        const now = new Date().toISOString();
+        const newProvider: HealthcareProvider = {
+          ...provider,
+          id: `provider_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+          createdAt: now,
+          updatedAt: now
+        };
+
+        set((state) => ({
+          providers: [...state.providers, newProvider]
+        }));
+      },
+
+      updateProvider: (id, updates) => {
+        set((state) => ({
+          providers: state.providers.map((provider) =>
+            provider.id === id
+              ? { ...provider, ...updates, updatedAt: new Date().toISOString() }
+              : provider
+          )
+        }));
+      },
+
+      deleteProvider: (id) => {
+        set((state) => ({
+          providers: state.providers.filter(provider => provider.id !== id)
+        }));
+      },
+
+      getProvider: (id) => {
+        return get().providers.find(provider => provider.id === id);
+      },
+
+      getProvidersByFamilyMember: (familyMemberId) => {
+        return get().providers.filter(provider =>
+          provider.familyMemberIds.includes(familyMemberId)
+        );
+      },
+
+      groupProvidersByFamily: () => {
+        const { familyMembers, providers } = get();
+        return familyMembers.map(familyMember => ({
+          familyMember,
+          providers: providers.filter(provider =>
+            provider.familyMemberIds.includes(familyMember.id)
+          )
+        })).filter(group => group.providers.length > 0);
+      },
+
+      markProviderUsed: (id) => {
+        set((state) => ({
+          providers: state.providers.map((provider) =>
+            provider.id === id
+              ? { ...provider, lastUsed: new Date().toISOString(), updatedAt: new Date().toISOString() }
+              : provider
+          )
+        }));
+      },
+
+      getProvidersForMultipleMembers: () => {
+        return get().providers.filter(provider => provider.familyMemberIds.length > 1);
+      },
+
+      searchProviders: (query) => {
+        const lowerQuery = query.toLowerCase();
+        return get().providers.filter(provider =>
+          provider.providerName.toLowerCase().includes(lowerQuery) ||
+          provider.portalName.toLowerCase().includes(lowerQuery) ||
+          provider.specialty.toLowerCase().includes(lowerQuery) ||
+          provider.portalPlatform.toLowerCase().includes(lowerQuery)
+        );
       }
     }),
     {
-      name: 'family-members-storage',
+      name: 'family-healthcare-storage',
       storage: createJSONStorage(() => localStorage),
       
       // Initialize with default family member if empty

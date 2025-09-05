@@ -37,17 +37,71 @@ export interface FamilyMember {
   updatedAt: string; // ISO date string
 }
 
-export interface Provider {
+export const PORTAL_PLATFORMS = [
+  "Epic MyChart",
+  "Cerner HealtheLife", 
+  "athenahealth",
+  "NextMD",
+  "AllScripts FollowMyHealth",
+  "DrChrono",
+  "Practice Fusion",
+  "eClinicalWorks",
+  "Greenway",
+  "Other"
+] as const;
+
+export type PortalPlatform = typeof PORTAL_PLATFORMS[number];
+
+export const HEALTHCARE_SPECIALTIES = [
+  "Primary Care",
+  "Family Medicine", 
+  "Internal Medicine",
+  "Pediatrics",
+  "Cardiology",
+  "Dermatology",
+  "Endocrinology",
+  "Gastroenterology",
+  "Neurology",
+  "Oncology",
+  "Orthopedics",
+  "Psychiatry",
+  "Radiology",
+  "Surgery",
+  "Urology",
+  "Gynecology",
+  "Ophthalmology",
+  "ENT (Ear, Nose, Throat)",
+  "Dentistry",
+  "Vision/Optometry",
+  "Mental Health",
+  "Physical Therapy",
+  "Urgent Care",
+  "Emergency Medicine",
+  "Other"
+] as const;
+
+export type HealthcareSpecialty = typeof HEALTHCARE_SPECIALTIES[number];
+
+export interface HealthcareProvider {
   id: string;
-  name: string; // "Dr. Johnson", "City Dental Group"
-  specialty: string; // "Primary Care", "Dentistry", "Cardiology"
+  providerName: string; // "Dr. Sarah Johnson", "City Dental Group"
+  portalName: string; // "Johnson Family Practice Portal", "City Dental Patient Access"
   portalUrl: string; // Direct link to patient portal login
-  portalPlatform: string; // "MyChart", "Epic", "Patient Portal", "Cerner"
+  portalPlatform: PortalPlatform; // Standardized platform types
+  specialty: HealthcareSpecialty; // Standardized specialty types
   familyMemberIds: string[]; // Array of family member IDs this provider serves
-  notes?: string; // Optional notes about provider
-  username?: string; // Optional - portal username hint (not password)
-  lastAccessed?: string; // ISO date string of last portal access
-  quickAddData?: QuickAddData; // Data from quick-add detection
+  loginUsername?: string; // Optional - portal username hint (never password)
+  notes?: string; // Optional notes about provider or portal
+  lastUsed?: string; // ISO date string of last portal access
+  autoDetected: boolean; // Whether this was auto-detected via quick-add
+  createdAt: string; // ISO date string
+  updatedAt: string; // ISO date string
+  quickAddData?: QuickAddData; // Metadata from quick-add detection
+}
+
+// Keep old Provider interface for backward compatibility during transition
+export interface Provider extends HealthcareProvider {
+  name: string; // Alias for providerName for backward compatibility
 }
 
 export interface QuickAddData {

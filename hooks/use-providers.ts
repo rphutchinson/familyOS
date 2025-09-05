@@ -26,10 +26,15 @@ export function useProviders() {
     }
   }, [providers]);
 
-  const addProvider = (provider: Omit<Provider, 'id'>) => {
+  const addProvider = (provider: Omit<Provider, 'id' | 'createdAt' | 'updatedAt'>) => {
+    const now = new Date().toISOString();
     const newProvider: Provider = {
       ...provider,
-      id: Date.now().toString() + Math.random().toString(36).substr(2, 9)
+      id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
+      createdAt: now,
+      updatedAt: now,
+      // Ensure backward compatibility for Provider interface
+      name: provider.providerName || provider.name || 'Unknown Provider'
     };
     setProviders(prev => [...prev, newProvider]);
   };
@@ -37,7 +42,13 @@ export function useProviders() {
   const updateProvider = (id: string, updates: Partial<Provider>) => {
     setProviders(prev => 
       prev.map(provider => 
-        provider.id === id ? { ...provider, ...updates } : provider
+        provider.id === id ? { 
+          ...provider, 
+          ...updates, 
+          updatedAt: new Date().toISOString(),
+          // Ensure backward compatibility
+          name: updates.providerName || updates.name || provider.name || provider.providerName
+        } : provider
       )
     );
   };

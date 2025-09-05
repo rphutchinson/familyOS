@@ -1,70 +1,35 @@
 "use client";
 
 import { useState } from "react";
-import { Plus, ExternalLink, Users, Settings, Zap } from "lucide-react";
+import { Plus, Users, Zap } from "lucide-react";
 import Link from "next/link";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { ProviderCard } from "@/components/provider-card";
+import { AddProviderForm } from "@/components/add-provider-form";
+import { EditProviderForm } from "@/components/edit-provider-form";
 import { useFamilyStore } from "@/lib/stores/family-store";
-import { Provider, FamilyMember } from "@/types";
+import { HealthcareProvider } from "@/types";
 
 export default function Home() {
-  const { familyMembers } = useFamilyStore();
-  const [showAddProvider, setShowAddProvider] = useState(false);
+  const { familyMembers, providers, groupProvidersByFamily } = useFamilyStore();
+  const [editingProvider, setEditingProvider] = useState<HealthcareProvider | null>(null);
+  const [showEditForm, setShowEditForm] = useState(false);
 
-  // TODO: Replace with actual provider store when implemented
-  const providers: Provider[] = []; // Empty for now until provider management is built
+  // Get family groups with providers
+  const familyGroups = groupProvidersByFamily();
 
-  // Sample data for demo when no real data exists  
-  const sampleFamilyMembers: FamilyMember[] = [
-    { id: "self", name: "Me", relationship: "Self", color: "#3b82f6", isDefault: true, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
-    { id: "spouse", name: "Sarah", relationship: "Spouse", color: "#ef4444", isDefault: false, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
-    { id: "child1", name: "Emma", relationship: "Child", color: "#22c55e", isDefault: false, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() }
-  ];
+  const handleEditProvider = (provider: HealthcareProvider) => {
+    setEditingProvider(provider);
+    setShowEditForm(true);
+  };
 
-  const sampleProviders: Provider[] = [
-    {
-      id: "1",
-      name: "Dr. Johnson",
-      specialty: "Primary Care", 
-      portalUrl: "https://mychart.example.com",
-      portalPlatform: "MyChart",
-      familyMemberIds: ["self"]
-    },
-    {
-      id: "2",
-      name: "City Dental",
-      specialty: "Dentistry",
-      portalUrl: "https://patientportal.example.com", 
-      portalPlatform: "Patient Portal",
-      familyMemberIds: ["self", "spouse", "child1"]
-    },
-    {
-      id: "3",
-      name: "Children's Hospital",
-      specialty: "Pediatrics",
-      portalUrl: "https://epic.example.com",
-      portalPlatform: "Epic",
-      familyMemberIds: ["child1"]
+  const handleCloseEditForm = (open: boolean) => {
+    setShowEditForm(open);
+    if (!open) {
+      setEditingProvider(null);
     }
-  ];
-
-  // Use real data if available, otherwise show demo data
-  const displayFamilyMembers = familyMembers.length > 0 ? familyMembers : sampleFamilyMembers;
-  const displayProviders = providers.length > 0 ? providers : sampleProviders;
-
-  // Group providers by family member
-  const familyGroups = displayFamilyMembers.map(familyMember => ({
-    familyMember,
-    providers: displayProviders.filter(provider => 
-      provider.familyMemberIds.includes(familyMember.id)
-    )
-  })).filter(group => group.providers.length > 0);
-
-  const handlePortalClick = (provider: Provider) => {
-    // TODO: Implement markProviderAccessed when provider store is built
-    window.open(provider.portalUrl, '_blank');
   };
 
   return (
@@ -88,10 +53,7 @@ export default function Home() {
                 Manage Family
               </Link>
             </Button>
-            <Button onClick={() => setShowAddProvider(true)}>
-              <Plus className="h-4 w-4 mr-2" />
-              Add Provider
-            </Button>
+            <AddProviderForm />
           </div>
         </div>
 
@@ -124,7 +86,7 @@ export default function Home() {
             <div className="flex items-center gap-3 mb-4">
               <div 
                 className="w-4 h-4 rounded-full" 
-                style={{ backgroundColor: group.familyMember.color || '#94a3b8' }}
+                style={{ backgroundColor: group.familyMember.color }}
               />
               <h2 className="text-xl font-semibold">
                 {group.familyMember.name}
@@ -136,53 +98,12 @@ export default function Home() {
             
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
               {group.providers.map((provider) => (
-                <Card key={provider.id} className="hover:shadow-md transition-all duration-200">
-                  <CardHeader className="pb-3">
-                    <div className="flex items-start justify-between">
-                      <div className="min-w-0 flex-1">
-                        <CardTitle className="text-lg truncate">{provider.name}</CardTitle>
-                        <CardDescription className="text-sm">
-                          {provider.specialty}
-                        </CardDescription>
-                      </div>
-                      {provider.quickAddData?.autoDetected && (
-                        <Badge variant="outline" className="text-xs ml-2">
-                          Auto-detected
-                        </Badge>
-                      )}
-                    </div>
-                  </CardHeader>
-                  
-                  <CardContent className="space-y-3">
-                    <div className="text-sm">
-                      <span className="font-medium text-muted-foreground">Portal:</span>
-                      <span className="ml-2">{provider.portalPlatform}</span>
-                    </div>
-                    
-                    {provider.username && (
-                      <div className="text-sm">
-                        <span className="font-medium text-muted-foreground">Username:</span>
-                        <span className="ml-2 font-mono text-xs">{provider.username}</span>
-                      </div>
-                    )}
-                    
-                    {provider.notes && (
-                      <p className="text-sm text-muted-foreground">
-                        {provider.notes}
-                      </p>
-                    )}
-
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
-                      className="w-full"
-                      onClick={() => handlePortalClick(provider)}
-                    >
-                      <ExternalLink className="h-4 w-4 mr-2" />
-                      Open Portal
-                    </Button>
-                  </CardContent>
-                </Card>
+                <ProviderCard
+                  key={provider.id}
+                  provider={provider}
+                  familyMembers={familyMembers}
+                  onEdit={handleEditProvider}
+                />
               ))}
             </div>
           </div>
@@ -205,13 +126,23 @@ export default function Home() {
                   Add Family Members
                 </Link>
               </Button>
-              <Button onClick={() => setShowAddProvider(true)}>
-                <Plus className="h-4 w-4 mr-2" />
-                Add Provider
-              </Button>
+              <AddProviderForm 
+                trigger={
+                  <Button>
+                    <Plus className="h-4 w-4 mr-2" />
+                    Add Provider
+                  </Button>
+                }
+              />
             </div>
           </div>
         )}
+        {/* Edit Provider Modal */}
+        <EditProviderForm
+          provider={editingProvider}
+          open={showEditForm}
+          onOpenChange={handleCloseEditForm}
+        />
       </div>
     </div>
   );

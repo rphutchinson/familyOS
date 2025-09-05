@@ -9,7 +9,9 @@ const DEFAULT_FAMILY_MEMBERS: FamilyMember[] = [
     name: 'Me',
     relationship: 'Self',
     color: '#3b82f6',
-    isDefault: true
+    isDefault: true,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
   }
 ];
 
@@ -40,10 +42,13 @@ export function useFamilyMembers() {
     }
   }, [familyMembers]);
 
-  const addFamilyMember = (familyMember: Omit<FamilyMember, 'id'>) => {
+  const addFamilyMember = (familyMember: Omit<FamilyMember, 'id' | 'createdAt' | 'updatedAt'>) => {
+    const now = new Date().toISOString();
     const newFamilyMember: FamilyMember = {
       ...familyMember,
-      id: Date.now().toString() + Math.random().toString(36).substr(2, 9)
+      id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
+      createdAt: now,
+      updatedAt: now
     };
     setFamilyMembers(prev => [...prev, newFamilyMember]);
   };
@@ -51,7 +56,7 @@ export function useFamilyMembers() {
   const updateFamilyMember = (id: string, updates: Partial<FamilyMember>) => {
     setFamilyMembers(prev => 
       prev.map(member => 
-        member.id === id ? { ...member, ...updates } : member
+        member.id === id ? { ...member, ...updates, updatedAt: new Date().toISOString() } : member
       )
     );
   };
