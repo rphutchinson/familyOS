@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ExternalLink, MoreHorizontal, Edit, Trash2, Globe, User, Clock } from "lucide-react";
+import { ExternalLink, MoreHorizontal, Edit, Trash2, User, Clock } from "lucide-react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";

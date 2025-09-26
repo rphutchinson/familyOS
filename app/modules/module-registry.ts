@@ -1,17 +1,18 @@
 import { FamilyModule } from '@/types';
+import { BaseModule } from './base-module';
 
 /**
  * Central registry for managing FamilyOS modules
  * Handles module registration, discovery, and lifecycle
  */
 class ModuleRegistry {
-  private modules: Map<string, FamilyModule> = new Map();
+  private modules: Map<string, BaseModule> = new Map();
   private initialized: Set<string> = new Set();
 
   /**
    * Register a new module with the registry
    */
-  register(module: FamilyModule): void {
+  register(module: BaseModule): void {
     if (this.modules.has(module.id)) {
       console.warn(`Module ${module.id} is already registered`);
       return;
@@ -25,10 +26,10 @@ class ModuleRegistry {
    * Unregister a module from the registry
    */
   unregister(moduleId: string): void {
-    const module = this.modules.get(moduleId);
-    if (module && this.initialized.has(moduleId)) {
+    const moduleInstance = this.modules.get(moduleId);
+    if (moduleInstance && this.initialized.has(moduleId)) {
       // Cleanup module if it was initialized
-      module.cleanup?.();
+      moduleInstance.cleanup?.();
       this.initialized.delete(moduleId);
     }
 
@@ -39,28 +40,28 @@ class ModuleRegistry {
   /**
    * Get a module by ID
    */
-  getModule(moduleId: string): FamilyModule | undefined {
+  getModule(moduleId: string): BaseModule | undefined {
     return this.modules.get(moduleId);
   }
 
   /**
    * Get all registered modules
    */
-  getAllModules(): FamilyModule[] {
+  getAllModules(): BaseModule[] {
     return Array.from(this.modules.values());
   }
 
   /**
    * Get enabled modules only
    */
-  getEnabledModules(): FamilyModule[] {
+  getEnabledModules(): BaseModule[] {
     return this.getAllModules().filter(module => module.enabled);
   }
 
   /**
    * Get modules by category
    */
-  getModulesByCategory(category: FamilyModule['category']): FamilyModule[] {
+  getModulesByCategory(category: BaseModule['category']): FamilyModule[] {
     return this.getAllModules().filter(module => module.category === category);
   }
 
@@ -68,8 +69,8 @@ class ModuleRegistry {
    * Initialize a specific module
    */
   async initializeModule(moduleId: string): Promise<boolean> {
-    const module = this.modules.get(moduleId);
-    if (!module) {
+    const moduleInstance = this.modules.get(moduleId);
+    if (!moduleInstance) {
       console.error(`Module ${moduleId} not found`);
       return false;
     }
@@ -80,7 +81,7 @@ class ModuleRegistry {
     }
 
     try {
-      await module.initialize?.();
+      await moduleInstance.initialize?.();
       this.initialized.add(moduleId);
       console.log(`Module ${moduleId} initialized successfully`);
       return true;
@@ -120,9 +121,9 @@ class ModuleRegistry {
    * Enable a module
    */
   enableModule(moduleId: string): void {
-    const module = this.modules.get(moduleId);
-    if (module) {
-      module.enabled = true;
+    const moduleInstance = this.modules.get(moduleId);
+    if (moduleInstance) {
+      moduleInstance.enabled = true;
       console.log(`Enabled module: ${moduleId}`);
     }
   }
@@ -131,11 +132,11 @@ class ModuleRegistry {
    * Disable a module
    */
   disableModule(moduleId: string): void {
-    const module = this.modules.get(moduleId);
-    if (module) {
-      module.enabled = false;
+    const moduleInstance = this.modules.get(moduleId);
+    if (moduleInstance) {
+      moduleInstance.enabled = false;
       if (this.initialized.has(moduleId)) {
-        module.cleanup?.();
+        moduleInstance.cleanup?.();
         this.initialized.delete(moduleId);
       }
       console.log(`Disabled module: ${moduleId}`);

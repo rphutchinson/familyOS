@@ -1,9 +1,8 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { Plus, Users, Zap, Heart } from "lucide-react";
-import Link from "next/link";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Plus, Zap, Heart } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ProviderCard } from "./components/provider-card";
@@ -19,7 +18,7 @@ export default function HealthcarePage() {
   const [selectedFamilyMemberId, setSelectedFamilyMemberId] = useState<string | "all">("all");
 
   // Get family groups with providers
-  const familyGroups = groupProvidersByFamily();
+  const _familyGroups = groupProvidersByFamily();
 
   // Filter providers based on selected family member
   const filteredData = useMemo(() => {
@@ -80,7 +79,7 @@ export default function HealthcarePage() {
               Healthcare Portal Manager
             </h1>
             <p className="text-muted-foreground mt-2">
-              Organize and access your family's healthcare provider portals
+              Organize and access your family&apos;s healthcare provider portals
             </p>
           </div>
 

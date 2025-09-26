@@ -33,7 +33,7 @@ import {
 import { Plus } from "lucide-react";
 import { familyMemberSchema, FamilyMemberFormData } from "@/lib/validations/family-validation";
 import { useFamilyStore } from "@/lib/stores/family-store";
-import { FAMILY_RELATIONSHIPS, FAMILY_COLORS, FamilyRelationship } from "@/types";
+import { FAMILY_RELATIONSHIPS, FAMILY_COLORS } from "@/types";
 
 interface AddFamilyMemberFormProps {
   trigger?: React.ReactNode;

@@ -1,4 +1,4 @@
-import { FamilyModule } from '@/types';
+import { FamilyModule, ModuleRoute, ModuleComponent } from '@/types';
 
 /**
  * Base abstract class that all FamilyOS modules should extend
@@ -27,11 +27,11 @@ export abstract class BaseModule implements FamilyModule {
   }
 
   // Content methods - can be overridden
-  getRoutes(): any[] {
+  getRoutes(): ModuleRoute[] {
     return [];
   }
 
-  getComponents(): any[] {
+  getComponents(): ModuleComponent[] {
     return [];
   }
 

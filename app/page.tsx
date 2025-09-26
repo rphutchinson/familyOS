@@ -59,7 +59,7 @@ export default function Dashboard() {
               FamilyOS Dashboard
             </h1>
             <p className="text-muted-foreground mt-2">
-              Your family's organization headquarters
+              Your family&apos;s organization headquarters
             </p>
           </div>
 

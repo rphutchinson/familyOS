@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Users, Plus, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { FamilyMemberCard } from "./components/family-member-card";
 import { AddFamilyMemberForm } from "./components/add-family-member-form";
 import { EditFamilyMemberForm } from "./components/edit-family-member-form";
@@ -126,7 +126,7 @@ export default function FamilyManagementPage() {
               <div className="flex-1">
                 <h3 className="font-medium mb-2">Tips for Family Management</h3>
                 <ul className="text-sm text-muted-foreground space-y-1">
-                  <li>• Use personal names like "Sarah" or "Dad" instead of just "Spouse" or "Parent"</li>
+                  <li>• Use personal names like &quot;Sarah&quot; or &quot;Dad&quot; instead of just &quot;Spouse&quot; or &quot;Parent&quot;</li>
                   <li>• Choose unique colors for each family member to make them easy to identify</li>
                   <li>• The default member is used for quick-add functionality and provider suggestions</li>
                   <li>• You can share providers between family members (e.g., family dentist)</li>

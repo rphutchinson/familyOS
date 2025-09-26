@@ -1,11 +1,11 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import { FamilyMember, FamilyRelationship } from '@/types';
+import { FamilyMember, HealthcareProvider, FamilyGroup } from '@/types';
 
 interface FamilyState {
   familyMembers: FamilyMember[];
   currentUser: FamilyMember | null;
-  appSettings: any; // Will be properly typed later
+  appSettings: Record<string, unknown>; // Will be properly typed later
 
   // Actions
   addFamilyMember: (member: Omit<FamilyMember, 'id' | 'createdAt' | 'updatedAt'>) => void;
@@ -16,12 +16,12 @@ interface FamilyState {
   getDefaultFamilyMember: () => FamilyMember | null;
   getAvailableColor: () => string;
   setDefaultFamilyMember: (id: string) => void;
-  addProvider: (provider: any) => void;
-  updateProvider: (id: string, updates: any) => void;
+  addProvider: (provider: Omit<HealthcareProvider, 'id' | 'createdAt' | 'updatedAt'>) => void;
+  updateProvider: (id: string, updates: Partial<HealthcareProvider>) => void;
   deleteProvider: (id: string) => void;
   markProviderUsed: (id: string) => void;
-  providers: any[];
-  groupProvidersByFamily: () => any;
+  providers: HealthcareProvider[];
+  groupProvidersByFamily: () => FamilyGroup[];
 }
 
 export const useFamilyStore = create<FamilyState>()(
@@ -111,7 +111,7 @@ export const useFamilyStore = create<FamilyState>()(
 
       updateProvider: (id, updates) => {
         set((state) => ({
-          providers: state.providers.map((provider: any) =>
+          providers: state.providers.map((provider) =>
             provider.id === id
               ? { ...provider, ...updates, updatedAt: new Date().toISOString() }
               : provider
@@ -121,13 +121,13 @@ export const useFamilyStore = create<FamilyState>()(
 
       deleteProvider: (id) => {
         set((state) => ({
-          providers: state.providers.filter((provider: any) => provider.id !== id),
+          providers: state.providers.filter((provider) => provider.id !== id),
         }));
       },
 
       markProviderUsed: (id) => {
         set((state) => ({
-          providers: state.providers.map((provider: any) =>
+          providers: state.providers.map((provider) =>
             provider.id === id
               ? { ...provider, lastUsed: new Date().toISOString(), updatedAt: new Date().toISOString() }
               : provider
@@ -139,7 +139,7 @@ export const useFamilyStore = create<FamilyState>()(
         const state = get();
         return state.familyMembers.map(member => ({
           familyMember: member,
-          providers: state.providers.filter((provider: any) =>
+          providers: state.providers.filter((provider) =>
             provider.familyMemberIds?.includes(member.id)
           )
         }));
@@ -149,7 +149,7 @@ export const useFamilyStore = create<FamilyState>()(
       name: 'familyos-family-storage',
       storage: createJSONStorage(() => localStorage),
       version: 1,
-      migrate: (persistedState: any, version: number) => {
+      migrate: (persistedState: Record<string, unknown>, version: number) => {
         if (version === 0) {
           return {
             familyMembers: [],
