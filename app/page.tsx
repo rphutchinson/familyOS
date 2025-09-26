@@ -107,44 +107,55 @@ export default function Dashboard() {
         {/* Modules Grid */}
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 mb-8">
           {modules.map((module) => (
-            <Card
-              key={module.name}
-              className={`transition-all hover:shadow-lg ${
-                module.available
-                  ? "cursor-pointer hover:-translate-y-1"
-                  : "opacity-60"
-              }`}
-            >
-              <CardHeader className="pb-3">
-                <div className="flex items-center justify-between">
-                  <div className={`p-2 rounded-lg ${module.color}`}>
-                    <module.icon className="h-5 w-5" />
+            module.available ? (
+              <Link key={module.name} href={module.href} className="block">
+                <Card className="transition-all hover:shadow-lg cursor-pointer hover:-translate-y-1 h-full">
+                  <CardHeader className="pb-3">
+                    <div className="flex items-center justify-between">
+                      <div className={`p-2 rounded-lg ${module.color}`}>
+                        <module.icon className="h-5 w-5" />
+                      </div>
+                      {module.count > 0 && (
+                        <Badge variant="secondary">
+                          {module.count}
+                        </Badge>
+                      )}
+                    </div>
+                    <CardTitle className="text-lg">{module.name}</CardTitle>
+                    <CardDescription className="text-sm">
+                      {module.description}
+                    </CardDescription>
+                  </CardHeader>
+                </Card>
+              </Link>
+            ) : (
+              <Card
+                key={module.name}
+                className="opacity-60 h-full"
+              >
+                <CardHeader className="pb-3">
+                  <div className="flex items-center justify-between">
+                    <div className={`p-2 rounded-lg ${module.color}`}>
+                      <module.icon className="h-5 w-5" />
+                    </div>
+                    {module.count > 0 && (
+                      <Badge variant="secondary">
+                        {module.count}
+                      </Badge>
+                    )}
                   </div>
-                  {module.count > 0 && (
-                    <Badge variant="secondary">
-                      {module.count}
-                    </Badge>
-                  )}
-                </div>
-                <CardTitle className="text-lg">{module.name}</CardTitle>
-                <CardDescription className="text-sm">
-                  {module.description}
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="pt-0">
-                {module.available ? (
-                  <Button asChild className="w-full">
-                    <Link href={module.href}>
-                      Open {module.name}
-                    </Link>
-                  </Button>
-                ) : (
+                  <CardTitle className="text-lg">{module.name}</CardTitle>
+                  <CardDescription className="text-sm">
+                    {module.description}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="pt-0">
                   <Button disabled className="w-full">
                     Coming Soon
                   </Button>
-                )}
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+            )
           ))}
         </div>
 

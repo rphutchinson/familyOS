@@ -63,6 +63,8 @@ export function AddProviderForm({ trigger }: AddProviderFormProps) {
       const defaultMember = getDefaultFamilyMember();
       if (defaultMember) {
         form.setValue("familyMemberIds", [defaultMember.id]);
+      } else {
+        form.setValue("familyMemberIds", []);
       }
     } else {
       form.reset();
@@ -180,47 +182,55 @@ export function AddProviderForm({ trigger }: AddProviderFormProps) {
                   <FormDescription>
                     Select which family members use this provider.
                   </FormDescription>
-                  <div className="space-y-3">
-                    {familyMembers.map((member) => (
-                      <FormField
-                        key={member.id}
-                        control={form.control}
-                        name="familyMemberIds"
-                        render={({ field }) => {
-                          return (
-                            <FormItem
-                              key={member.id}
-                              className="flex flex-row items-center space-x-3 space-y-0"
-                            >
-                              <FormControl>
-                                <Checkbox
-                                  checked={field.value?.includes(member.id)}
-                                  onCheckedChange={(checked) => {
-                                    return checked
-                                      ? field.onChange([...field.value, member.id])
-                                      : field.onChange(
-                                          field.value?.filter(
-                                            (value) => value !== member.id
-                                          )
-                                        );
-                                  }}
-                                />
-                              </FormControl>
-                              <div className="flex items-center gap-2">
-                                <div 
-                                  className="w-3 h-3 rounded-full" 
-                                  style={{ backgroundColor: member.color }}
-                                />
-                                <FormLabel className="text-sm font-normal">
-                                  {member.name} ({member.relationship})
-                                </FormLabel>
-                              </div>
-                            </FormItem>
-                          );
-                        }}
-                      />
-                    ))}
-                  </div>
+                  {familyMembers.length === 0 ? (
+                    <div className="p-4 border border-dashed rounded-lg text-center">
+                      <p className="text-sm text-muted-foreground">
+                        No family members found. Please add a family member first before adding providers.
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      {familyMembers.map((member) => (
+                        <FormField
+                          key={member.id}
+                          control={form.control}
+                          name="familyMemberIds"
+                          render={({ field }) => {
+                            return (
+                              <FormItem
+                                key={member.id}
+                                className="flex flex-row items-center space-x-3 space-y-0"
+                              >
+                                <FormControl>
+                                  <Checkbox
+                                    checked={field.value?.includes(member.id)}
+                                    onCheckedChange={(checked) => {
+                                      return checked
+                                        ? field.onChange([...field.value, member.id])
+                                        : field.onChange(
+                                            field.value?.filter(
+                                              (value) => value !== member.id
+                                            )
+                                          );
+                                    }}
+                                  />
+                                </FormControl>
+                                <div className="flex items-center gap-2">
+                                  <div
+                                    className="w-3 h-3 rounded-full"
+                                    style={{ backgroundColor: member.color }}
+                                  />
+                                  <FormLabel className="text-sm font-normal">
+                                    {member.name} ({member.relationship})
+                                  </FormLabel>
+                                </div>
+                              </FormItem>
+                            );
+                          }}
+                        />
+                      ))}
+                    </div>
+                  )}
                   <FormMessage />
                 </FormItem>
               )}
@@ -264,14 +274,19 @@ export function AddProviderForm({ trigger }: AddProviderFormProps) {
             />
 
             <DialogFooter>
-              <Button 
-                type="button" 
-                variant="outline" 
+              <Button
+                type="button"
+                variant="outline"
                 onClick={() => setOpen(false)}
               >
                 Cancel
               </Button>
-              <Button type="submit">Add Provider</Button>
+              <Button
+                type="submit"
+                disabled={familyMembers.length === 0}
+              >
+                Add Provider
+              </Button>
             </DialogFooter>
           </form>
         </Form>

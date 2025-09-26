@@ -85,12 +85,6 @@ export default function HealthcarePage() {
           </div>
 
           <div className="flex gap-2">
-            <Button variant="outline" asChild>
-              <Link href="/modules/family">
-                <Users className="h-4 w-4 mr-2" />
-                Manage Family
-              </Link>
-            </Button>
             <AddProviderForm />
           </div>
         </div>
@@ -225,12 +219,6 @@ export default function HealthcarePage() {
               Start by adding family members and their healthcare providers to organize portal access.
             </p>
             <div className="flex gap-2 justify-center">
-              <Button variant="outline" asChild>
-                <Link href="/modules/family">
-                  <Users className="h-4 w-4 mr-2" />
-                  Add Family Members
-                </Link>
-              </Button>
               <AddProviderForm
                 trigger={
                   <Button>

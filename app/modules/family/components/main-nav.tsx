@@ -20,12 +20,12 @@ const navigation = [
   },
   {
     name: "Healthcare",
-    href: "/healthcare",
+    href: "/modules/healthcare",
     icon: Heart,
   },
   {
     name: "Family",
-    href: "/family",
+    href: "/modules/family",
     icon: Users,
   },
 ];

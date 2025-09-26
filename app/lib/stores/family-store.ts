@@ -19,6 +19,7 @@ interface FamilyState {
   addProvider: (provider: any) => void;
   updateProvider: (id: string, updates: any) => void;
   deleteProvider: (id: string) => void;
+  markProviderUsed: (id: string) => void;
   providers: any[];
   groupProvidersByFamily: () => any;
 }
@@ -121,6 +122,16 @@ export const useFamilyStore = create<FamilyState>()(
       deleteProvider: (id) => {
         set((state) => ({
           providers: state.providers.filter((provider: any) => provider.id !== id),
+        }));
+      },
+
+      markProviderUsed: (id) => {
+        set((state) => ({
+          providers: state.providers.map((provider: any) =>
+            provider.id === id
+              ? { ...provider, lastUsed: new Date().toISOString(), updatedAt: new Date().toISOString() }
+              : provider
+          ),
         }));
       },
 
