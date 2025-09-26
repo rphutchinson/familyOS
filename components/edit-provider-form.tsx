@@ -30,9 +30,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
-import { providerSchema, ProviderFormData } from "@/lib/validations/provider-validation";
+import { providerFormSchema, ProviderFormData } from "@/lib/validations/provider-validation";
 import { useFamilyStore } from "@/lib/stores/family-store";
-import { PORTAL_PLATFORMS, HEALTHCARE_SPECIALTIES, HealthcareProvider } from "@/types";
+import { HEALTHCARE_SPECIALTIES, HealthcareProvider } from "@/types";
 
 interface EditProviderFormProps {
   provider: HealthcareProvider | null;
@@ -44,17 +44,14 @@ export function EditProviderForm({ provider, open, onOpenChange }: EditProviderF
   const { updateProvider, familyMembers } = useFamilyStore();
 
   const form = useForm<ProviderFormData>({
-    resolver: zodResolver(providerSchema),
+    resolver: zodResolver(providerFormSchema),
     defaultValues: {
       providerName: "",
-      portalName: "",
       portalUrl: "",
-      portalPlatform: "Other",
       specialty: "Other",
       familyMemberIds: [],
       loginUsername: "",
       notes: "",
-      autoDetected: false,
     },
   });
 
@@ -63,14 +60,11 @@ export function EditProviderForm({ provider, open, onOpenChange }: EditProviderF
     if (provider) {
       form.reset({
         providerName: provider.providerName,
-        portalName: provider.portalName,
         portalUrl: provider.portalUrl,
-        portalPlatform: provider.portalPlatform,
         specialty: provider.specialty,
         familyMemberIds: provider.familyMemberIds,
         loginUsername: provider.loginUsername || "",
-        notes: provider.notes || "",
-        autoDetected: provider.autoDetected,
+        notes: provider.notes || ""
       });
     }
   }, [provider, form]);
@@ -81,9 +75,7 @@ export function EditProviderForm({ provider, open, onOpenChange }: EditProviderF
     try {
       updateProvider(provider.id, {
         providerName: data.providerName,
-        portalName: data.portalName,
         portalUrl: data.portalUrl,
-        portalPlatform: data.portalPlatform,
         specialty: data.specialty,
         familyMemberIds: data.familyMemberIds,
         loginUsername: data.loginUsername || undefined,
@@ -163,70 +155,20 @@ export function EditProviderForm({ provider, open, onOpenChange }: EditProviderF
 
             <FormField
               control={form.control}
-              name="portalName"
+              name="portalUrl"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Portal Name *</FormLabel>
+                  <FormLabel>Portal URL *</FormLabel>
                   <FormControl>
                     <Input 
-                      placeholder="e.g., Johnson Family Practice Patient Portal" 
+                      placeholder="https://example.mychart.com" 
                       {...field} 
                     />
                   </FormControl>
-                  <FormDescription>
-                    The name of the patient portal or website.
-                  </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
             />
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="portalUrl"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Portal URL *</FormLabel>
-                    <FormControl>
-                      <Input 
-                        placeholder="https://example.mychart.com" 
-                        {...field} 
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="portalPlatform"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Portal Platform *</FormLabel>
-                    <Select 
-                      onValueChange={field.onChange} 
-                      value={field.value}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select platform" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {PORTAL_PLATFORMS.map((platform) => (
-                          <SelectItem key={platform} value={platform}>
-                            {platform}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
 
             <FormField
               control={form.control}

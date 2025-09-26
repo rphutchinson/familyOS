@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { PORTAL_PLATFORMS, HEALTHCARE_SPECIALTIES } from "@/types";
+import { HEALTHCARE_SPECIALTIES } from "@/types";
 
 export const providerSchema = z.object({
   providerName: z
@@ -7,12 +7,6 @@ export const providerSchema = z.object({
     .min(1, "Provider name is required")
     .min(2, "Provider name must be at least 2 characters")
     .max(100, "Provider name must be less than 100 characters"),
-  
-  portalName: z
-    .string()
-    .min(1, "Portal name is required")
-    .min(2, "Portal name must be at least 2 characters")
-    .max(100, "Portal name must be less than 100 characters"),
   
   portalUrl: z
     .string()
@@ -27,12 +21,9 @@ export const providerSchema = z.object({
       }
     }, "URL must be a valid HTTP or HTTPS URL"),
   
-  portalPlatform: z.enum(PORTAL_PLATFORMS, {
-    required_error: "Please select a portal platform",
-  }),
   
-  specialty: z.enum(HEALTHCARE_SPECIALTIES, {
-    required_error: "Please select a specialty",
+  specialty: z.enum(HEALTHCARE_SPECIALTIES).refine((val) => val, {
+    message: "Please select a specialty"
   }),
   
   familyMemberIds: z
@@ -66,6 +57,9 @@ export const quickAddProviderSchema = providerSchema.partial().extend({
   familyMemberIds: z.array(z.string()).min(1, "Please select at least one family member"),
 });
 
-export type ProviderFormData = z.infer<typeof providerSchema>;
+// Form data excludes autoDetected since it's not user input
+export const providerFormSchema = providerSchema.omit({ autoDetected: true });
+
+export type ProviderFormData = z.infer<typeof providerFormSchema>;
 export type EditProviderFormData = z.infer<typeof editProviderSchema>;
 export type QuickAddProviderFormData = z.infer<typeof quickAddProviderSchema>;

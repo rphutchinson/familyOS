@@ -63,18 +63,14 @@ export function ProviderCard({ provider, familyMembers, onEdit, className }: Pro
   };
 
   return (
-    <Card className={cn("hover:shadow-md transition-all duration-200", className)}>
+    <Card className={cn("hover:shadow-md transition-all duration-200 flex flex-col h-full", className)}>
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between">
           <div className="min-w-0 flex-1">
             <h3 className="font-semibold text-lg truncate">{provider.providerName}</h3>
-            <p className="text-sm text-muted-foreground truncate">{provider.portalName}</p>
             <div className="flex items-center gap-2 mt-1">
               <Badge variant="outline" className="text-xs">
                 {provider.specialty}
-              </Badge>
-              <Badge variant="secondary" className="text-xs">
-                {provider.portalPlatform}
               </Badge>
             </div>
           </div>
@@ -113,7 +109,8 @@ export function ProviderCard({ provider, familyMembers, onEdit, className }: Pro
         </div>
       </CardHeader>
       
-      <CardContent className="space-y-4">
+      <CardContent className="flex-1 flex flex-col">
+        <div className="space-y-4 flex-1">
         {/* Family Members */}
         <div>
           <div className="text-sm font-medium text-muted-foreground mb-2">Family Members:</div>
@@ -155,15 +152,16 @@ export function ProviderCard({ provider, familyMembers, onEdit, className }: Pro
           <Clock className="h-3 w-3 mr-1" />
           Last used: {formatLastUsed(provider.lastUsed)}
         </div>
+        </div>
 
-        {/* Portal Login Button */}
+        {/* Portal Login Button - Always at bottom */}
         <Button 
           onClick={handlePortalClick}
-          className="w-full"
+          className="w-full cursor-pointer mt-4"
           size="sm"
         >
           <ExternalLink className="h-4 w-4 mr-2" />
-          Open {provider.portalName}
+          Open Portal
         </Button>
       </CardContent>
     </Card>

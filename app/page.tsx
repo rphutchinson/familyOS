@@ -1,36 +1,53 @@
 "use client";
 
-import { useState } from "react";
-import { Plus, Users, Zap } from "lucide-react";
+import { Users, Heart, Plus, Calendar, DollarSign } from "lucide-react";
 import Link from "next/link";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ProviderCard } from "@/components/provider-card";
-import { AddProviderForm } from "@/components/add-provider-form";
-import { EditProviderForm } from "@/components/edit-provider-form";
 import { useFamilyStore } from "@/lib/stores/family-store";
-import { HealthcareProvider } from "@/types";
 
-export default function Home() {
-  const { familyMembers, providers, groupProvidersByFamily } = useFamilyStore();
-  const [editingProvider, setEditingProvider] = useState<HealthcareProvider | null>(null);
-  const [showEditForm, setShowEditForm] = useState(false);
+export default function Dashboard() {
+  const { familyMembers, providers } = useFamilyStore();
 
-  // Get family groups with providers
-  const familyGroups = groupProvidersByFamily();
-
-  const handleEditProvider = (provider: HealthcareProvider) => {
-    setEditingProvider(provider);
-    setShowEditForm(true);
-  };
-
-  const handleCloseEditForm = (open: boolean) => {
-    setShowEditForm(open);
-    if (!open) {
-      setEditingProvider(null);
+  const modules = [
+    {
+      name: "Healthcare",
+      description: "Manage healthcare providers and portal access",
+      icon: Heart,
+      href: "/healthcare",
+      count: providers.length,
+      color: "bg-red-50 text-red-600 border-red-200",
+      available: true
+    },
+    {
+      name: "Tasks & Todos",
+      description: "Family task coordination and assignments",
+      icon: Plus,
+      href: "/tasks",
+      count: 0,
+      color: "bg-blue-50 text-blue-600 border-blue-200",
+      available: false
+    },
+    {
+      name: "Calendar",
+      description: "Unified family calendar and events",
+      icon: Calendar,
+      href: "/calendar",
+      count: 0,
+      color: "bg-green-50 text-green-600 border-green-200",
+      available: false
+    },
+    {
+      name: "Finances",
+      description: "Budget tracking and expense management",
+      icon: DollarSign,
+      href: "/finances",
+      count: 0,
+      color: "bg-yellow-50 text-yellow-600 border-yellow-200",
+      available: false
     }
-  };
+  ];
 
   return (
     <div className="min-h-screen bg-background">
@@ -39,13 +56,13 @@ export default function Home() {
         <div className="flex items-center justify-between mb-8">
           <div>
             <h1 className="text-3xl font-bold tracking-tight">
-              Family Healthcare Portals
+              FamilyOS Dashboard
             </h1>
             <p className="text-muted-foreground mt-2">
-              Quick access to healthcare portals for your family
+              Your family's organization headquarters
             </p>
           </div>
-          
+
           <div className="flex gap-2">
             <Button variant="outline" asChild>
               <Link href="/family">
@@ -53,96 +70,103 @@ export default function Home() {
                 Manage Family
               </Link>
             </Button>
-            <AddProviderForm />
           </div>
         </div>
 
-        {/* Quick Add Section */}
-        <Card className="mb-8 border-dashed">
-          <CardContent className="pt-6">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-primary/10 rounded-lg">
-                  <Zap className="h-5 w-5 text-primary" />
-                </div>
-                <div>
-                  <h3 className="font-medium">Quick Add</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Currently viewing a healthcare portal? Quick-add it here.
-                  </p>
-                </div>
+        {/* Family Overview */}
+        {familyMembers.length > 0 && (
+          <Card className="mb-8">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Users className="h-5 w-5" />
+                Family Overview
+              </CardTitle>
+              <CardDescription>
+                Your family members and their organization modules
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-center gap-2 flex-wrap">
+                {familyMembers.map((member) => (
+                  <div
+                    key={member.id}
+                    className="flex items-center gap-2 bg-muted px-3 py-2 rounded-lg"
+                  >
+                    <div
+                      className="w-3 h-3 rounded-full"
+                      style={{ backgroundColor: member.color }}
+                    />
+                    <span className="text-sm font-medium">{member.name}</span>
+                  </div>
+                ))}
               </div>
-              <Button variant="outline" size="sm">
-                <Plus className="h-4 w-4 mr-2" />
-                Quick Add Current Site
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        )}
 
-        {/* Family Groups */}
-        {familyGroups.map((group) => (
-          <div key={group.familyMember.id} className="mb-8">
-            <div className="flex items-center gap-3 mb-4">
-              <div 
-                className="w-4 h-4 rounded-full" 
-                style={{ backgroundColor: group.familyMember.color }}
-              />
-              <h2 className="text-xl font-semibold">
-                {group.familyMember.name}
-              </h2>
-              <Badge variant="secondary" className="text-xs">
-                {group.providers.length} {group.providers.length === 1 ? 'provider' : 'providers'}
-              </Badge>
-            </div>
-            
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {group.providers.map((provider) => (
-                <ProviderCard
-                  key={provider.id}
-                  provider={provider}
-                  familyMembers={familyMembers}
-                  onEdit={handleEditProvider}
-                />
-              ))}
-            </div>
-          </div>
-        ))}
+        {/* Modules Grid */}
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 mb-8">
+          {modules.map((module) => (
+            <Card
+              key={module.name}
+              className={`transition-all hover:shadow-lg ${
+                module.available
+                  ? "cursor-pointer hover:-translate-y-1"
+                  : "opacity-60"
+              }`}
+            >
+              <CardHeader className="pb-3">
+                <div className="flex items-center justify-between">
+                  <div className={`p-2 rounded-lg ${module.color}`}>
+                    <module.icon className="h-5 w-5" />
+                  </div>
+                  {module.count > 0 && (
+                    <Badge variant="secondary">
+                      {module.count}
+                    </Badge>
+                  )}
+                </div>
+                <CardTitle className="text-lg">{module.name}</CardTitle>
+                <CardDescription className="text-sm">
+                  {module.description}
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="pt-0">
+                {module.available ? (
+                  <Button asChild className="w-full">
+                    <Link href={module.href}>
+                      Open {module.name}
+                    </Link>
+                  </Button>
+                ) : (
+                  <Button disabled className="w-full">
+                    Coming Soon
+                  </Button>
+                )}
+              </CardContent>
+            </Card>
+          ))}
+        </div>
 
-        {/* Empty State */}
-        {familyGroups.length === 0 && (
-          <div className="text-center py-12">
-            <div className="mx-auto w-24 h-24 bg-muted rounded-full flex items-center justify-center mb-4">
-              <Users className="h-12 w-12 text-muted-foreground" />
-            </div>
-            <h3 className="text-lg font-semibold mb-2">No providers yet</h3>
-            <p className="text-muted-foreground mb-4 max-w-md mx-auto">
-              Start by adding family members and their healthcare providers to organize portal access.
-            </p>
-            <div className="flex gap-2 justify-center">
-              <Button variant="outline" asChild>
+        {/* Quick Start */}
+        {familyMembers.length === 0 && (
+          <Card className="border-dashed">
+            <CardHeader className="text-center">
+              <CardTitle>Welcome to FamilyOS</CardTitle>
+              <CardDescription>
+                Start by adding your family members to begin organizing
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="text-center">
+              <Button asChild>
                 <Link href="/family">
                   <Users className="h-4 w-4 mr-2" />
                   Add Family Members
                 </Link>
               </Button>
-              <AddProviderForm 
-                trigger={
-                  <Button>
-                    <Plus className="h-4 w-4 mr-2" />
-                    Add Provider
-                  </Button>
-                }
-              />
-            </div>
-          </div>
+            </CardContent>
+          </Card>
         )}
-        {/* Edit Provider Modal */}
-        <EditProviderForm
-          provider={editingProvider}
-          open={showEditForm}
-          onOpenChange={handleCloseEditForm}
-        />
       </div>
     </div>
   );

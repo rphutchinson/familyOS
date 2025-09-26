@@ -1,7 +1,11 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { MainNav } from "@/components/main-nav";
+import { FamilyDataProvider, setupFamilyOS } from "@/lib/modules";
 import "./globals.css";
+
+// Initialize the FamilyOS module system
+setupFamilyOS();
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -14,8 +18,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Family Healthcare Portal Organizer",
-  description: "Personal healthcare provider portal organizer for families",
+  title: "FamilyOS - Family Organization Platform",
+  description: "Comprehensive family organization platform for healthcare, tasks, and more",
 };
 
 export default function RootLayout({
@@ -28,8 +32,10 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <MainNav />
-        <main>{children}</main>
+        <FamilyDataProvider>
+          <MainNav />
+          <main>{children}</main>
+        </FamilyDataProvider>
       </body>
     </html>
   );

@@ -9,8 +9,8 @@ export const familyMemberSchema = z.object({
     .max(50, "Name must be less than 50 characters")
     .regex(/^[a-zA-Z\s'-]+$/, "Name can only contain letters, spaces, hyphens, and apostrophes"),
   
-  relationship: z.enum(FAMILY_RELATIONSHIPS, {
-    required_error: "Please select a relationship",
+  relationship: z.enum(FAMILY_RELATIONSHIPS).refine((val) => val, {
+    message: "Please select a relationship"
   }),
   
   color: z

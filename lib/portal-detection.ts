@@ -60,14 +60,12 @@ export function detectHealthcarePortal(
   const fullText = `${url} ${pageTitle || ''} ${siteName || ''}`.toLowerCase();
   
   // Check for healthcare portal patterns
-  let detectedPlatform = 'Unknown Portal';
   let confidence = 0.3; // Base confidence for any healthcare site
   
   // Check against known portal patterns
-  for (const [platform, patterns] of Object.entries(PORTAL_PATTERNS)) {
+  for (const [, patterns] of Object.entries(PORTAL_PATTERNS)) {
     for (const pattern of patterns) {
       if (pattern.test(fullText)) {
-        detectedPlatform = platform;
         confidence = Math.min(0.95, confidence + 0.4);
         break;
       }
@@ -106,7 +104,6 @@ export function detectHealthcarePortal(
   
   return {
     siteName: extractedSiteName,
-    portalPlatform: detectedPlatform,
     confidence,
     favicon: `${new URL(url).origin}/favicon.ico`
   };

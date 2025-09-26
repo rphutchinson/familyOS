@@ -1,4 +1,4 @@
-// Family-Focused Healthcare Portal Organizer Types
+// FamilyOS - Family Organization Platform Types
 
 export const FAMILY_RELATIONSHIPS = [
   "Self",
@@ -27,6 +27,54 @@ export const FAMILY_COLORS = [
   "#6366f1", // Indigo
 ] as const;
 
+// Core family preference types for cross-module functionality
+export interface NotificationPreferences {
+  enabled: boolean;
+  email?: string;
+  reminderTypes: string[];
+  quietHours?: {
+    start: string; // "22:00"
+    end: string;   // "08:00"
+  };
+}
+
+export interface UIPreferences {
+  theme?: 'light' | 'dark' | 'system';
+  compactView?: boolean;
+  defaultModule?: string; // Default module to show on app load
+  dashboardLayout?: 'grid' | 'list';
+}
+
+export interface HealthcarePreferences {
+  defaultInsurance?: string;
+  emergencyContact?: string;
+  allergies?: string[];
+  medications?: string[];
+  preferredLanguage?: string;
+}
+
+export interface FamilyPreferences {
+  healthcare?: HealthcarePreferences;
+  notifications?: NotificationPreferences;
+  ui?: UIPreferences;
+  // Future modules: todos?, calendar?, meals?, streaming?, etc.
+}
+
+export interface FamilyMemberMetadata {
+  // Extensible metadata for future modules
+  [key: string]: any;
+}
+
+export interface ModulePermissions {
+  // Future: Fine-grained permissions for family organization features
+  healthcare?: {
+    canView: boolean;
+    canEdit: boolean;
+    canManageProviders: boolean;
+  };
+  // Future: todos?, calendar?, meals?, etc.
+}
+
 export interface FamilyMember {
   id: string;
   name: string; // "John", "Jane", "Emma", "Dad", etc.
@@ -35,22 +83,13 @@ export interface FamilyMember {
   isDefault: boolean; // Mark primary family member (usually "Self")
   createdAt: string; // ISO date string
   updatedAt: string; // ISO date string
+
+  // New FamilyOS enhanced fields
+  preferences?: FamilyPreferences; // Cross-module preferences
+  metadata?: FamilyMemberMetadata; // Extensible data storage
+  modulePermissions?: ModulePermissions; // Future access control
 }
 
-export const PORTAL_PLATFORMS = [
-  "Epic MyChart",
-  "Cerner HealtheLife", 
-  "athenahealth",
-  "NextMD",
-  "AllScripts FollowMyHealth",
-  "DrChrono",
-  "Practice Fusion",
-  "eClinicalWorks",
-  "Greenway",
-  "Other"
-] as const;
-
-export type PortalPlatform = typeof PORTAL_PLATFORMS[number];
 
 export const HEALTHCARE_SPECIALTIES = [
   "Primary Care",
@@ -85,9 +124,7 @@ export type HealthcareSpecialty = typeof HEALTHCARE_SPECIALTIES[number];
 export interface HealthcareProvider {
   id: string;
   providerName: string; // "Dr. Sarah Johnson", "City Dental Group"
-  portalName: string; // "Johnson Family Practice Portal", "City Dental Patient Access"
   portalUrl: string; // Direct link to patient portal login
-  portalPlatform: PortalPlatform; // Standardized platform types
   specialty: HealthcareSpecialty; // Standardized specialty types
   familyMemberIds: string[]; // Array of family member IDs this provider serves
   loginUsername?: string; // Optional - portal username hint (never password)
@@ -104,8 +141,13 @@ export interface Provider extends HealthcareProvider {
   name: string; // Alias for providerName for backward compatibility
 }
 
+// Create a computed provider that includes the name field
+export const createProviderWithName = (healthcareProvider: HealthcareProvider): Provider => ({
+  ...healthcareProvider,
+  name: healthcareProvider.providerName
+});
+
 export interface QuickAddData {
-  detectedPlatform?: string; // Auto-detected portal platform
   siteName?: string; // Extracted site name
   favicon?: string; // Provider favicon URL
   autoDetected: boolean; // Whether this was auto-detected vs manual
@@ -120,7 +162,57 @@ export interface FamilyGroup {
 // For quick-add portal detection
 export interface PortalDetectionResult {
   siteName: string;
-  portalPlatform: string;
   confidence: number; // 0-1 confidence score
   favicon?: string;
+}
+
+// FamilyOS Module System Types
+export interface ModuleRoute {
+  path: string;
+  name: string;
+  component: React.ComponentType;
+}
+
+export interface ModuleComponent {
+  name: string;
+  component: React.ComponentType;
+  props?: Record<string, any>;
+}
+
+export interface FamilyModule {
+  id: string;
+  name: string;
+  icon: any; // LucideIcon type - will be imported where used
+  description: string;
+  version: string;
+  enabled: boolean;
+  category: 'health' | 'productivity' | 'entertainment' | 'finance' | 'other';
+
+  // Module lifecycle
+  initialize?: () => Promise<void> | void;
+  cleanup?: () => Promise<void> | void;
+
+  // Module content
+  getRoutes?: () => ModuleRoute[];
+  getComponents?: () => ModuleComponent[];
+
+  // Module permissions and requirements
+  requiredPermissions?: string[];
+  familyMemberAccess?: 'all' | 'self' | 'adults' | 'custom';
+}
+
+// App-level state management types
+export interface AppSettings {
+  enabledModules: string[];
+  defaultModule: string;
+  theme: 'light' | 'dark' | 'system';
+  compactMode: boolean;
+  firstTimeSetup: boolean;
+}
+
+// For future module data synchronization
+export interface ModuleDataContext {
+  familyMembers: FamilyMember[];
+  currentUser?: FamilyMember;
+  appSettings: AppSettings;
 }

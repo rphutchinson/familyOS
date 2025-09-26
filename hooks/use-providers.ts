@@ -71,19 +71,19 @@ export function useProviders() {
   };
 
   const markProviderAccessed = (id: string) => {
-    updateProvider(id, { lastAccessed: new Date().toISOString() });
+    updateProvider(id, { lastUsed: new Date().toISOString() });
   };
 
   // Quick add functionality for browser integration
   const quickAddProvider = (url: string, detectedData?: any) => {
-    const newProvider: Omit<Provider, 'id'> = {
+    const newProvider: Omit<Provider, 'id' | 'createdAt' | 'updatedAt'> = {
       name: detectedData?.siteName || 'New Provider',
-      specialty: 'Unknown',
+      providerName: detectedData?.siteName || 'New Provider',
+      specialty: 'Other',
       portalUrl: url,
-      portalPlatform: detectedData?.portalPlatform || 'Unknown',
       familyMemberIds: [], // Will need to be assigned
+      autoDetected: !!detectedData,
       quickAddData: {
-        detectedPlatform: detectedData?.portalPlatform,
         siteName: detectedData?.siteName,
         favicon: detectedData?.favicon,
         autoDetected: !!detectedData
