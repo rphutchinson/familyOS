@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import { AppSettings } from '@/types';
-import { moduleRegistry } from '../shared/module-registry';
+import { AppSettings } from './types';
+import { moduleRegistry } from './modules/module-registry';
 
 interface AppState {
   // App-level settings and configuration

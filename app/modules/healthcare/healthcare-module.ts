@@ -1,5 +1,5 @@
 import { Heart } from 'lucide-react';
-import { BaseModule } from '../shared/base-module';
+import { BaseModule } from '../base-module';
 
 /**
  * Healthcare module for FamilyOS

@@ -22,7 +22,7 @@ export function FamilyDataProvider({ children }: FamilyDataProviderProps) {
 
   const contextValue: ModuleDataContext = {
     familyMembers,
-    currentUser: getDefaultFamilyMember(),
+    currentUser: getDefaultFamilyMember() || undefined,
     appSettings,
   };
 

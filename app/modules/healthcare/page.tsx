@@ -6,9 +6,9 @@ import Link from "next/link";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ProviderCard } from "@/components/provider-card";
-import { AddProviderForm } from "@/components/add-provider-form";
-import { EditProviderForm } from "@/components/edit-provider-form";
+import { ProviderCard } from "./components/provider-card";
+import { AddProviderForm } from "./components/add-provider-form";
+import { EditProviderForm } from "./components/edit-provider-form";
 import { useFamilyStore } from "@/lib/stores/family-store";
 import { HealthcareProvider } from "@/types";
 
@@ -86,7 +86,7 @@ export default function HealthcarePage() {
 
           <div className="flex gap-2">
             <Button variant="outline" asChild>
-              <Link href="/family">
+              <Link href="/modules/family">
                 <Users className="h-4 w-4 mr-2" />
                 Manage Family
               </Link>
@@ -226,7 +226,7 @@ export default function HealthcarePage() {
             </p>
             <div className="flex gap-2 justify-center">
               <Button variant="outline" asChild>
-                <Link href="/family">
+                <Link href="/modules/family">
                   <Users className="h-4 w-4 mr-2" />
                   Add Family Members
                 </Link>

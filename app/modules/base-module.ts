@@ -27,11 +27,11 @@ export abstract class BaseModule implements FamilyModule {
   }
 
   // Content methods - can be overridden
-  getRoutes() {
+  getRoutes(): any[] {
     return [];
   }
 
-  getComponents() {
+  getComponents(): any[] {
     return [];
   }
 

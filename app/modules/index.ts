@@ -5,7 +5,7 @@
  * interface for the module system
  */
 
-import { moduleRegistry } from './shared/module-registry';
+import { moduleRegistry } from './module-registry';
 import { healthcareModule } from './healthcare/healthcare-module';
 
 /**
@@ -43,10 +43,10 @@ export function setupFamilyOS() {
 }
 
 // Export common module utilities
-export { moduleRegistry } from './shared/module-registry';
-export { BaseModule } from './shared/base-module';
-export { FamilyDataProvider, useFamilyData, useCurrentUser, useFamilyMembers, useAppSettings } from './shared/family-context';
-export { useAppStore } from './core/app-store';
+export { moduleRegistry } from './module-registry';
+export { BaseModule } from './base-module';
+export { FamilyDataProvider, useFamilyData, useCurrentUser, useFamilyMembers, useAppSettings } from './family/family-context';
+export { useAppStore } from '../app-store';
 
 // Export module implementations
 export { healthcareModule } from './healthcare/healthcare-module';
