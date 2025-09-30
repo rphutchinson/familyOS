@@ -20,14 +20,6 @@ A modern healthcare provider management system built with Next.js 15, TypeScript
 - **Icons:** Lucide React
 - **Development:** Turbopack for fast builds
 
-## Developer Tools
-
-This project includes enhanced developer experience tools:
-
-- 🤖 **AI-Powered Commits** - Use `git ai-commit` to generate conventional commit messages
-- 📖 **Auto-Documentation** - Pre-commit hooks automatically update CLAUDE.md
-- 🔧 **Manual Doc Updates** - Run `npm run update-docs` to refresh documentation
-
 ## Getting Started
 
 First, run the development server:
