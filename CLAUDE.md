@@ -1,120 +1,57 @@
-# FamilyOS - Family Organization Platform - CLAUDE.md
+# FamilyOS - Technical Documentation for AI Assistance
 
-This documentation describes the current state of FamilyOS, a modular family organization platform.
+This document provides technical specifications and interaction guidelines for AI assistants working on the FamilyOS codebase.
 
-## Current Application Overview
+## Core Technology Stack
 
-**FamilyOS** is a comprehensive family organization platform built on a modular architecture foundation. Starting with healthcare portal management as the core module, it provides an extensible framework for managing all aspects of family organization while maintaining privacy-first principles.
-
-The platform serves as an intelligent family coordination system that can grow with your family's needs through additional modules.
-
-## Platform Architecture
-
-### Modular Foundation
-FamilyOS is built on a sophisticated module system that allows for:
-- **Dynamic Module Loading**: Add or remove family organization features as needed
-- **Consistent Interface**: All modules follow standard patterns for seamless integration
-- **Cross-Module Data Sharing**: Family data and preferences work across all modules
-- **Independent Development**: Modules can be developed and updated independently
-
-### Current Modules
-
-#### Healthcare Module (v1.0.0) ✅
-- **Provider Portal Management**: Organize and access healthcare provider portals
-- **Family Association**: Associate providers with one or more family members
-- **Quick Portal Access**: One-click access to patient portals with usage tracking
-- **Intelligent Detection**: Automatic healthcare portal recognition from URLs
-
-#### Future Modules (Roadmap)
-- **Todo Lists & Task Management**: Family task coordination with assignments
-- **Meal Planning & Grocery Lists**: Weekly planning with automated shopping lists
-- **Family Calendar**: Unified calendar with shared and personal events
-- **Streaming Service Management**: Track and organize family entertainment subscriptions
-- **Budget & Expense Tracking**: Family financial coordination
-
-## Enhanced Family System
-
-### Advanced Family Profiles
-- **Rich Preferences**: Healthcare, UI, and notification preferences per family member
-- **Cross-Module Metadata**: Extensible data storage for future module needs
-- **Permission System**: Future fine-grained access control across modules
-- **Relationship Management**: Comprehensive family relationship support
-
-### Family Data Features
-- **Color-Coded Organization**: Unique colors for visual family member identification
-- **Default Member Protection**: Primary family member cannot be deleted
-- **Preference Inheritance**: Module preferences that can be inherited or customized
-- **Migration Support**: Automatic data migration as the platform evolves
-
-## Technical Architecture
-
-### Core Technology Stack
 - **Framework:** Next.js 15.5.2 with App Router and Turbopack
 - **Language:** TypeScript with strict mode for complete type safety
 - **Styling:** Tailwind CSS v4 with CSS variables
 - **UI Components:** shadcn/ui (New York style) with custom module patterns
+- **State Management:** Zustand with localStorage persistence and automatic migration
 - **Icons:** Lucide React
 - **Fonts:** Geist Sans & Geist Mono
 
-### State Management System
-- **Modular State Architecture**: Separate stores for core family data and individual modules
-- **Zustand with Persistence**: localStorage persistence with automatic migration
-- **Module Registry**: Central system for module discovery and lifecycle management
-- **React Context Integration**: Seamless data sharing between modules
+## Architecture Patterns
 
-### Data Storage & Privacy
-- **100% Local Storage**: All data stored locally in browser localStorage
-- **No External Dependencies**: Zero external services or data transmission
-- **Automatic Migration**: Data structure migrations handled transparently
-- **Version Control**: State versioning for future compatibility
+### Module System
+- **Base Module Class**: All modules extend from a base class with standard lifecycle methods
+- **Module Registry**: Centralized registration system in `src/lib/modules/registry.ts`
+- **Modular State Architecture**: Separate Zustand stores for core family data and individual modules
+- **Module-Specific Routes**: Each module defines its own routes and navigation items
 
-## Module System Details
+### State Management
+- **Zustand Stores**: Located in `src/lib/store/` directory
+- **Persistence Layer**: Automatic localStorage persistence with version migration
+- **State Versioning**: Each store includes a version number for migration support
+- **React Context**: Family data exposed via React Context for cross-module access
 
-### Module Registry
-- **Centralized Management**: Single registry for all family organization modules
-- **Lifecycle Control**: Module initialization, cleanup, and state management
-- **Dynamic Loading**: Modules can be enabled/disabled at runtime
-- **Route & Component Discovery**: Automatic integration of module interfaces
+### Data Storage
+- **100% Local Storage**: All data stored in browser localStorage
+- **No Backend**: Zero external services or API calls for data persistence
+- **Migration System**: Automatic data structure migrations on version changes
+- **Store Structure**:
+  - `family-store`: Core family member data and preferences
+  - `healthcare-store`: Healthcare module-specific data
+  - Additional stores per module as needed
 
-### Cross-Module Integration
-- **Family Data Context**: Shared family information available to all modules
-- **Consistent Patterns**: Standard interfaces for module development
-- **Preference System**: Module-specific preferences integrated with family profiles
-- **Navigation Integration**: Unified navigation supporting multiple modules
+## Key File Locations
 
-## Current User Experience
+### Core System
+- **Module Registry**: `src/lib/modules/registry.ts`
+- **Base Module**: `src/lib/modules/base-module.ts`
+- **Family Store**: `src/lib/store/family-store.ts`
+- **Family Context**: `src/contexts/FamilyContext.tsx`
 
-### Dashboard Interface
-- **Module-Aware Navigation**: Dynamic navigation based on enabled modules
-- **Family Filtering**: Consistent family member filtering across all modules
-- **Quick Actions**: Standardized quick action patterns
-- **Responsive Design**: Mobile-first approach optimized for all screen sizes
+### Healthcare Module
+- **Healthcare Store**: `src/lib/store/healthcare-store.ts`
+- **Healthcare Module**: `src/lib/modules/healthcare/index.ts`
+- **Provider Components**: `src/components/healthcare/`
+- **Healthcare Routes**: `src/app/healthcare/`
 
-### Healthcare Module Interface
-- **Provider Cards**: Clean display of provider information with family associations
-- **Portal Quick Access**: One-click access to patient portals
-- **Family Organization**: Providers grouped by family member or shown in unified view
-- **Quick Add System**: Intelligent healthcare portal detection and addition
-
-### Family Management
-- **Enhanced Profiles**: Rich family member profiles with preferences
-- **Cross-Module Coordination**: Family data that works across all modules
-- **Preference Management**: Module-specific settings per family member
-- **Relationship Support**: Comprehensive relationship types and management
-
-## Development & Extension
-
-### Module Development Framework
-- **Base Module Class**: Abstract base class for consistent module development
-- **Standard Interfaces**: Defined patterns for routes, components, and data
-- **Helper Utilities**: Shared utilities for logging, data access, and more
-- **Type Safety**: Full TypeScript support for module development
-
-### Component System
-- **Shared Components**: Reusable patterns for family member selection, headers, etc.
-- **Module-Specific Components**: Healthcare provider cards, forms, and interfaces
-- **Design System**: Consistent styling and interaction patterns
-- **Future-Ready**: Architecture prepared for additional module types
+### Shared Components
+- **Family Member Selector**: `src/components/family/FamilyMemberSelector.tsx`
+- **UI Components**: `src/components/ui/` (shadcn/ui components)
 
 ## Development Commands
 
@@ -135,48 +72,79 @@ npm run lint
 npx tsc --noEmit
 ```
 
-## Security & Privacy
+## Code Style & Conventions
 
-### Privacy-First Architecture
-- **Local-Only Storage**: All family data remains on the user's device
-- **No Account System**: No registration, login, or external authentication
-- **Zero Data Transmission**: No data sent to external servers
-- **Transparent Storage**: Users can inspect all data in browser developer tools
+### TypeScript
+- Strict mode enabled - all types must be explicitly defined
+- Use interfaces for object shapes, types for unions/primitives
+- Avoid `any` type - use `unknown` if type is truly unknown
+- Export types alongside implementations
 
-### Data Protection
-- **Family Information**: Names, relationships, preferences, and module-specific data
-- **Healthcare Data**: Only provider contact information and portal URLs
-- **No Medical Records**: Does not store actual medical data or private health information
-- **Usage Analytics**: Only local usage tracking for portal access patterns
+### Component Patterns
+- Use functional components with hooks
+- Prefer composition over prop drilling
+- Use React Context for cross-cutting concerns (family data)
+- Module-specific components in `src/components/{module-name}/`
 
-## Platform Vision
+### State Management
+- Use Zustand for complex state management
+- Use React hooks (useState, useReducer) for local component state
+- Persist important data to localStorage via Zustand middleware
+- Include migration logic when changing store structure
 
-### Current Capabilities
-- **Healthcare Portal Organization**: Comprehensive family healthcare coordination
-- **Modular Foundation**: Ready for additional family organization modules
-- **Privacy-Focused**: Complete local storage with no external dependencies
-- **Family-Centric**: Everything organized around family members and their needs
+### Styling
+- Use Tailwind utility classes
+- Follow shadcn/ui component patterns (New York style)
+- Use CSS variables for theme values
+- Mobile-first responsive design approach
 
-### Growth Potential
-- **Module Ecosystem**: Easy addition of new family organization features
-- **Cross-Module Intelligence**: Data and preferences that work across all modules
-- **Scalable Architecture**: Foundation that grows with family needs
-- **Future-Proof Design**: Extensible patterns for long-term platform evolution
+## Module Development Pattern
 
-## Module Integration Examples
+When creating a new module:
 
-### Healthcare Module Integration
+1. **Create Module Class**: Extend `BaseModule` in `src/lib/modules/{module-name}/index.ts`
+2. **Define Store**: Create Zustand store in `src/lib/store/{module-name}-store.ts`
+3. **Register Module**: Add to module registry initialization
+4. **Create Routes**: Add Next.js routes in `src/app/{module-name}/`
+5. **Build Components**: Create module-specific components in `src/components/{module-name}/`
+6. **Update Types**: Add preference types to family member preferences interface
+
+### Example Module Integration
 ```typescript
-// Healthcare module seamlessly integrates with family system
+// Module seamlessly integrates with family system
 const { familyMembers, currentUser } = useFamilyData();
-const healthcarePreferences = currentUser?.preferences?.healthcare;
+const modulePreferences = currentUser?.preferences?.moduleName;
 ```
 
-### Future Module Integration
-```typescript
-// Todo module will integrate using the same patterns
-const { familyMembers } = useFamilyData();
-const todoPreferences = currentUser?.preferences?.todos;
-```
+## Privacy & Security Principles
+
+- **Local-Only Storage**: Never transmit family data to external services
+- **No Authentication**: No user accounts, registration, or login systems
+- **Transparent Storage**: All data visible in browser developer tools
+- **No Analytics**: No external analytics or tracking services
+- **Sensitive Data**: Store only necessary information (no actual medical records, passwords, etc.)
+
+## Interaction Guidelines
+
+### File Management
+- **ALWAYS** prefer editing existing files over creating new ones
+- **NEVER** create files unless absolutely necessary for the task
+- **NEVER** proactively create documentation files (*.md) unless explicitly requested
+- Only create README files if explicitly requested by the user
+
+### Code Changes
+- Do what has been asked; nothing more, nothing less
+- Maintain existing code style and patterns
+- Follow the established architecture patterns
+- Ensure type safety - no TypeScript errors
+- Test changes with `npm run dev` before completing
+
+### Communication
+- Be concise and direct in responses
+- Reference specific files with clickable links: `[filename.ts](src/filename.ts)`
+- Reference specific lines: `[filename.ts:42](src/filename.ts#L42)`
+- Provide code examples when explaining patterns
 
 ---
+
+**Note**: For product requirements, features, and roadmap information, see [README.md](README.md)
