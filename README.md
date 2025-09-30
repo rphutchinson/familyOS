@@ -1,24 +1,38 @@
-# Healthcare Dashboard
+# FamilyOS
 
-A modern healthcare provider management system built with Next.js 15, TypeScript, and shadcn/ui. This dashboard provides an intuitive interface for managing healthcare providers, tracking patient appointments, and monitoring key metrics.
+A privacy-first family organization platform built on a modular architecture. Starting with healthcare portal management as the core module, FamilyOS provides an extensible framework for managing all aspects of family organization with 100% local storage.
 
 ## Features
 
-- 🏥 **Provider Management** - Comprehensive provider tracking and status management
-- 📅 **Appointment Scheduling** - Real-time appointment monitoring and management  
-- 📊 **Analytics Dashboard** - Key metrics and performance indicators
+### Healthcare Module (v1.0.0)
+- 🏥 **Provider Portal Management** - Organize and access healthcare provider portals
+- 👨‍👩‍👧‍👦 **Family Association** - Associate providers with one or more family members
+- 🚀 **Quick Portal Access** - One-click access to patient portals with usage tracking
+- 🔍 **Intelligent Detection** - Automatic healthcare portal recognition from URLs
+
+### Core Platform
+- 🔐 **Privacy-First** - 100% local storage, no external services or data transmission
+- 🧩 **Modular Architecture** - Dynamic module loading with consistent interfaces
+- 👥 **Family-Centric** - Rich family profiles with cross-module preferences
 - 🎨 **Modern UI** - Clean, responsive design with shadcn/ui components
-- 🌙 **Dark Mode Support** - Built-in light/dark theme switching
 - 📱 **Mobile Responsive** - Optimized for all device sizes
+
+### Coming Soon
+- Todo Lists & Task Management
+- Meal Planning & Grocery Lists
+- Family Calendar
+- Streaming Service Management
+- Budget & Expense Tracking
 
 ## Tech Stack
 
-- **Framework:** Next.js 15.5.2 with App Router
-- **Language:** TypeScript
-- **Styling:** Tailwind CSS v4
-- **Components:** shadcn/ui
+- **Framework:** Next.js 15.5.2 with App Router and Turbopack
+- **Language:** TypeScript with strict mode
+- **Styling:** Tailwind CSS v4 with CSS variables
+- **UI Components:** shadcn/ui (New York style)
+- **State Management:** Zustand with localStorage persistence
 - **Icons:** Lucide React
-- **Development:** Turbopack for fast builds
+- **Fonts:** Geist Sans & Geist Mono
 
 ## Getting Started
 
@@ -36,21 +50,3 @@ bun dev
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
