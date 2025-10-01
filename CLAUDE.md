@@ -16,12 +16,12 @@ This document provides technical specifications and interaction guidelines for A
 
 ### Module System
 - **Base Module Class**: All modules extend from a base class with standard lifecycle methods
-- **Module Registry**: Centralized registration system in `src/lib/modules/registry.ts`
+- **Module Registry**: Centralized registration system in `src/app/lib/modules/registry.ts`
 - **Modular State Architecture**: Separate Zustand stores for core family data and individual modules
 - **Module-Specific Routes**: Each module defines its own routes and navigation items
 
 ### State Management
-- **Zustand Stores**: Located in `src/lib/store/` directory
+- **Zustand Stores**: Located in `src/app/lib/store/` directory
 - **Persistence Layer**: Automatic localStorage persistence with version migration
 - **State Versioning**: Each store includes a version number for migration support
 - **React Context**: Family data exposed via React Context for cross-module access
@@ -38,20 +38,20 @@ This document provides technical specifications and interaction guidelines for A
 ## Key File Locations
 
 ### Core System
-- **Module Registry**: `src/lib/modules/registry.ts`
-- **Base Module**: `src/lib/modules/base-module.ts`
-- **Family Store**: `src/lib/store/family-store.ts`
-- **Family Context**: `src/contexts/FamilyContext.tsx`
+- **Module Registry**: `src/app/lib/modules/registry.ts`
+- **Base Module**: `src/app/lib/modules/base-module.ts`
+- **Family Store**: `src/app/lib/store/family-store.ts`
+- **Family Context**: `src/app/contexts/FamilyContext.tsx`
 
 ### Healthcare Module
-- **Healthcare Store**: `src/lib/store/healthcare-store.ts`
-- **Healthcare Module**: `src/lib/modules/healthcare/index.ts`
-- **Provider Components**: `src/components/healthcare/`
+- **Healthcare Store**: `src/app/lib/store/healthcare-store.ts`
+- **Healthcare Module**: `src/app/lib/modules/healthcare/index.ts`
+- **Provider Components**: `src/app/components/healthcare/`
 - **Healthcare Routes**: `src/app/healthcare/`
 
 ### Shared Components
-- **Family Member Selector**: `src/components/family/FamilyMemberSelector.tsx`
-- **UI Components**: `src/components/ui/` (shadcn/ui components)
+- **Family Member Selector**: `src/app/components/family/FamilyMemberSelector.tsx`
+- **UI Components**: `src/app/components/ui/` (shadcn/ui components)
 
 ## Development Commands
 
@@ -84,7 +84,7 @@ npx tsc --noEmit
 - Use functional components with hooks
 - Prefer composition over prop drilling
 - Use React Context for cross-cutting concerns (family data)
-- Module-specific components in `src/components/{module-name}/`
+- Module-specific components in `src/app/components/{module-name}/`
 
 ### State Management
 - Use Zustand for complex state management
@@ -102,11 +102,11 @@ npx tsc --noEmit
 
 When creating a new module:
 
-1. **Create Module Class**: Extend `BaseModule` in `src/lib/modules/{module-name}/index.ts`
-2. **Define Store**: Create Zustand store in `src/lib/store/{module-name}-store.ts`
+1. **Create Module Class**: Extend `BaseModule` in `src/app/lib/modules/{module-name}/index.ts`
+2. **Define Store**: Create Zustand store in `src/app/lib/store/{module-name}-store.ts`
 3. **Register Module**: Add to module registry initialization
 4. **Create Routes**: Add Next.js routes in `src/app/{module-name}/`
-5. **Build Components**: Create module-specific components in `src/components/{module-name}/`
+5. **Build Components**: Create module-specific components in `src/app/components/{module-name}/`
 6. **Update Types**: Add preference types to family member preferences interface
 
 ### Example Module Integration
@@ -141,8 +141,8 @@ const modulePreferences = currentUser?.preferences?.moduleName;
 
 ### Communication
 - Be concise and direct in responses
-- Reference specific files with clickable links: `[filename.ts](src/filename.ts)`
-- Reference specific lines: `[filename.ts:42](src/filename.ts#L42)`
+- Reference specific files with clickable links: `[filename.ts](src/app/filename.ts)`
+- Reference specific lines: `[filename.ts:42](src/app/filename.ts#L42)`
 - Provide code examples when explaining patterns
 
 ---

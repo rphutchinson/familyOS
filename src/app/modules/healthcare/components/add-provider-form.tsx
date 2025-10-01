@@ -34,7 +34,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Plus } from "lucide-react";
 import { providerFormSchema, ProviderFormData } from "@/lib/validations/provider-validation";
 import { useFamilyStore } from "@/lib/stores/family-store";
-import { HEALTHCARE_SPECIALTIES } from "@/types";
+import { HEALTHCARE_SPECIALTIES, HealthcareSpecialty } from "@/types";
 
 interface AddProviderFormProps {
   trigger?: React.ReactNode;
@@ -75,6 +75,7 @@ export function AddProviderForm({ trigger }: AddProviderFormProps) {
     try {
       addProvider({
         ...data,
+        specialty: data.specialty as HealthcareSpecialty,
         loginUsername: data.loginUsername || undefined,
         notes: data.notes || undefined,
         autoDetected: false,

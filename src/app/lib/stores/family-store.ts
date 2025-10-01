@@ -1,11 +1,11 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import { FamilyMember, HealthcareProvider, FamilyGroup } from '@/types';
+import { FamilyMember, HealthcareProvider, FamilyGroup, createProviderWithName, AppSettings } from '@/types';
 
 interface FamilyState {
   familyMembers: FamilyMember[];
   currentUser: FamilyMember | null;
-  appSettings: Record<string, unknown>; // Will be properly typed later
+  appSettings: AppSettings;
 
   // Actions
   addFamilyMember: (member: Omit<FamilyMember, 'id' | 'createdAt' | 'updatedAt'>) => void;
@@ -29,7 +29,13 @@ export const useFamilyStore = create<FamilyState>()(
     (set, get) => ({
       familyMembers: [],
       currentUser: null,
-      appSettings: {},
+      appSettings: {
+        enabledModules: ['family', 'healthcare'],
+        defaultModule: 'family',
+        theme: 'system',
+        compactMode: false,
+        firstTimeSetup: true,
+      },
       providers: [],
 
       addFamilyMember: (memberData) => {
@@ -139,9 +145,9 @@ export const useFamilyStore = create<FamilyState>()(
         const state = get();
         return state.familyMembers.map(member => ({
           familyMember: member,
-          providers: state.providers.filter((provider) =>
-            provider.familyMemberIds?.includes(member.id)
-          )
+          providers: state.providers
+            .filter((provider) => provider.familyMemberIds?.includes(member.id))
+            .map(createProviderWithName)
         }));
       },
     }),
@@ -149,7 +155,7 @@ export const useFamilyStore = create<FamilyState>()(
       name: 'familyos-family-storage',
       storage: createJSONStorage(() => localStorage),
       version: 1,
-      migrate: (persistedState: Record<string, unknown>, version: number) => {
+      migrate: (persistedState: unknown, version: number) => {
         if (version === 0) {
           return {
             familyMembers: [],

@@ -29,11 +29,7 @@ export function FamilyMemberCard({ member, onEdit, className }: FamilyMemberCard
   const handleDelete = async () => {
     setIsDeleting(true);
     try {
-      const success = deleteFamilyMember(member.id);
-      if (!success) {
-        // Could show toast error here
-        console.error("Cannot delete family member");
-      }
+      deleteFamilyMember(member.id);
     } catch (error) {
       console.error("Failed to delete family member:", error);
     } finally {

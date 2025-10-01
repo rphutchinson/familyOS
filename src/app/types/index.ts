@@ -170,12 +170,12 @@ export interface PortalDetectionResult {
 export interface ModuleRoute {
   path: string;
   name: string;
-  component: React.ComponentType;
+  component: React.ComponentType | null;
 }
 
 export interface ModuleComponent {
   name: string;
-  component: React.ComponentType;
+  component: React.ComponentType | null;
   props?: Record<string, any>;
 }
 

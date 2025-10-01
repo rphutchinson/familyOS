@@ -32,7 +32,7 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { providerFormSchema, ProviderFormData } from "@/lib/validations/provider-validation";
 import { useFamilyStore } from "@/lib/stores/family-store";
-import { HEALTHCARE_SPECIALTIES, HealthcareProvider } from "@/types";
+import { HEALTHCARE_SPECIALTIES, HealthcareProvider, HealthcareSpecialty } from "@/types";
 
 interface EditProviderFormProps {
   provider: HealthcareProvider | null;
@@ -76,7 +76,7 @@ export function EditProviderForm({ provider, open, onOpenChange }: EditProviderF
       updateProvider(provider.id, {
         providerName: data.providerName,
         portalUrl: data.portalUrl,
-        specialty: data.specialty,
+        specialty: data.specialty as HealthcareSpecialty,
         familyMemberIds: data.familyMemberIds,
         loginUsername: data.loginUsername || undefined,
         notes: data.notes || undefined,

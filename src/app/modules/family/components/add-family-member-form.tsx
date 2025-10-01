@@ -66,7 +66,10 @@ export function AddFamilyMemberForm({ trigger }: AddFamilyMemberFormProps) {
 
   const onSubmit = (data: FamilyMemberFormData) => {
     try {
-      addFamilyMember(data);
+      addFamilyMember({
+        ...data,
+        isDefault: data.isDefault ?? false
+      });
       setOpen(false);
       form.reset();
     } catch (error) {
