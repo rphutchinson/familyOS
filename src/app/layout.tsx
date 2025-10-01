@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import { MainNav } from "@/app/family/components/main-nav";
+import { MainNav } from "@/components/main-nav";
 import { FamilyDataProvider } from "@/app/family/family-context";
 import "@/styles/globals.css";
 

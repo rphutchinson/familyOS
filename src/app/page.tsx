@@ -15,7 +15,7 @@ export default function Dashboard() {
       name: "Healthcare",
       description: "Manage healthcare providers and portal access",
       icon: Heart,
-      href: "/modules/healthcare",
+      href: "/healthcare",
       count: providers.length,
       color: "bg-red-50 text-red-600 border-red-200",
       available: true
@@ -65,7 +65,7 @@ export default function Dashboard() {
 
           <div className="flex gap-2">
             <Button variant="outline" asChild>
-              <Link href="/modules/family">
+              <Link href="/family">
                 <Users className="h-4 w-4 mr-2" />
                 Manage Family
               </Link>
@@ -170,7 +170,7 @@ export default function Dashboard() {
             </CardHeader>
             <CardContent className="text-center">
               <Button asChild>
-                <Link href="/modules/family">
+                <Link href="/family">
                   <Users className="h-4 w-4 mr-2" />
                   Add Family Members
                 </Link>
