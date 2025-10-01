@@ -15,13 +15,12 @@ This document provides technical specifications and interaction guidelines for A
 ## Architecture Patterns
 
 ### Module System
-- **Base Module Class**: All modules extend from a base class with standard lifecycle methods
-- **Module Registry**: Centralized registration system in `src/app/lib/modules/registry.ts`
+- **Simple Route-Based Modules**: Each module is a separate route directory in `src/app/`
+- **No Registration Required**: Modules are standard Next.js App Router routes
 - **Modular State Architecture**: Separate Zustand stores for core family data and individual modules
-- **Module-Specific Routes**: Each module defines its own routes and navigation items
 
 ### State Management
-- **Zustand Stores**: Located in `src/app/lib/store/` directory
+- **Zustand Stores**: Located in `src/lib/stores/` directory
 - **Persistence Layer**: Automatic localStorage persistence with version migration
 - **State Versioning**: Each store includes a version number for migration support
 - **React Context**: Family data exposed via React Context for cross-module access
@@ -33,25 +32,25 @@ This document provides technical specifications and interaction guidelines for A
 - **Store Structure**:
   - `family-store`: Core family member data and preferences
   - `healthcare-store`: Healthcare module-specific data
+  - `app-store`: App-level settings and configuration
   - Additional stores per module as needed
 
 ## Key File Locations
 
 ### Core System
-- **Module Registry**: `src/app/lib/modules/registry.ts`
-- **Base Module**: `src/app/lib/modules/base-module.ts`
-- **Family Store**: `src/app/lib/store/family-store.ts`
-- **Family Context**: `src/app/contexts/FamilyContext.tsx`
+- **App Store**: `src/lib/stores/app-store.ts`
+- **Family Store**: `src/lib/stores/family-store.ts`
+- **Family Context**: `src/app/family/family-context.tsx`
+- **Main Navigation**: `src/app/family/components/main-nav.tsx`
 
 ### Healthcare Module
-- **Healthcare Store**: `src/app/lib/store/healthcare-store.ts`
-- **Healthcare Module**: `src/app/lib/modules/healthcare/index.ts`
-- **Provider Components**: `src/app/components/healthcare/`
+- **Healthcare Store**: `src/lib/stores/healthcare-store.ts`
 - **Healthcare Routes**: `src/app/healthcare/`
+- **Provider Components**: `src/app/healthcare/components/`
 
 ### Shared Components
-- **Family Member Selector**: `src/app/components/family/FamilyMemberSelector.tsx`
-- **UI Components**: `src/app/components/ui/` (shadcn/ui components)
+- **Family Member Selector**: `src/app/family/components/family-member-selector.tsx`
+- **UI Components**: `src/components/ui/` (shadcn/ui components)
 
 ## Development Commands
 
@@ -84,7 +83,7 @@ npx tsc --noEmit
 - Use functional components with hooks
 - Prefer composition over prop drilling
 - Use React Context for cross-cutting concerns (family data)
-- Module-specific components in `src/app/components/{module-name}/`
+- Module-specific components in `src/app/{module-name}/components/`
 
 ### State Management
 - Use Zustand for complex state management
@@ -102,16 +101,19 @@ npx tsc --noEmit
 
 When creating a new module:
 
-1. **Create Module Class**: Extend `BaseModule` in `src/app/lib/modules/{module-name}/index.ts`
-2. **Define Store**: Create Zustand store in `src/app/lib/store/{module-name}-store.ts`
-3. **Register Module**: Add to module registry initialization
-4. **Create Routes**: Add Next.js routes in `src/app/{module-name}/`
-5. **Build Components**: Create module-specific components in `src/app/components/{module-name}/`
-6. **Update Types**: Add preference types to family member preferences interface
+1. **Create Route Directory**: Create a new directory in `src/app/{module-name}/`
+2. **Define Store**: Create Zustand store in `src/lib/stores/{module-name}-store.ts` with localStorage persistence
+3. **Create Pages**: Add Next.js page components in `src/app/{module-name}/page.tsx`
+4. **Build Components**: Create module-specific components in `src/app/{module-name}/components/`
+5. **Update Navigation**: Add navigation link in `src/app/family/components/main-nav.tsx`
+6. **Update Types**: Add preference types to family member preferences interface if needed
 
 ### Example Module Integration
 ```typescript
-// Module seamlessly integrates with family system
+// Import family context in your module
+import { useFamilyData } from '@/app/family/family-context';
+
+// Use in your component
 const { familyMembers, currentUser } = useFamilyData();
 const modulePreferences = currentUser?.preferences?.moduleName;
 ```

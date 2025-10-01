@@ -1,11 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { MainNav } from "@/app/family/components/main-nav";
-import { FamilyDataProvider, setupFamilyOS } from "@/modules";
+import { FamilyDataProvider } from "@/app/family/family-context";
 import "@/styles/globals.css";
-
-// Initialize the FamilyOS module system
-setupFamilyOS();
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
