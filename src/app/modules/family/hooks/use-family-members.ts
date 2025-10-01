@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { FamilyMember } from '@/types';
+import { FamilyMember } from '@/app/types';
 
 const STORAGE_KEY = 'family-members';
 

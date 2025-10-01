@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Provider, FamilyGroup, FamilyMember } from '@/types';
+import { Provider, FamilyGroup, FamilyMember } from '@/app/types';
 
 const STORAGE_KEY = 'healthcare-providers';
 

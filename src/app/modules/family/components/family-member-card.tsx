@@ -2,19 +2,19 @@
 
 import { useState } from "react";
 import { MoreHorizontal, Edit, Trash2, Star, StarOff } from "lucide-react";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader } from "@/app/components/ui/card";
+import { Button } from "@/app/components/ui/button";
+import { Badge } from "@/app/components/ui/badge";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { FamilyMember } from "@/types";
-import { useFamilyStore } from "@/lib/stores/family-store";
-import { cn } from "@/lib/utils";
+} from "@/app/components/ui/dropdown-menu";
+import { FamilyMember } from "@/app/types";
+import { useFamilyStore } from "@/app/lib/stores/family-store";
+import { cn } from "@/app/lib/utils";
 
 interface FamilyMemberCardProps {
   member: FamilyMember;

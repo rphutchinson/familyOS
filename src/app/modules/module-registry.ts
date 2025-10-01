@@ -1,4 +1,4 @@
-import { FamilyModule } from '@/types';
+import { FamilyModule } from '@/app/types';
 import { BaseModule } from './base-module';
 
 /**

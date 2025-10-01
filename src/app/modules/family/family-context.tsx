@@ -1,8 +1,8 @@
 'use client';
 
 import React, { createContext, useContext, ReactNode } from 'react';
-import { ModuleDataContext } from '@/types';
-import { useFamilyStore } from '@/lib/stores/family-store';
+import { ModuleDataContext } from '@/app/types';
+import { useFamilyStore } from '@/app/lib/stores/family-store';
 
 /**
  * React context for sharing family and app data across modules

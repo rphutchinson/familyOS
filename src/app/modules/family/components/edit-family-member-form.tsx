@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/app/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -11,7 +11,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
+} from "@/app/components/ui/dialog";
 import {
   Form,
   FormControl,
@@ -20,18 +20,18 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
+} from "@/app/components/ui/form";
+import { Input } from "@/app/components/ui/input";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { familyMemberSchema, FamilyMemberFormData } from "@/lib/validations/family-validation";
-import { useFamilyStore } from "@/lib/stores/family-store";
-import { FAMILY_RELATIONSHIPS, FAMILY_COLORS, FamilyMember } from "@/types";
+} from "@/app/components/ui/select";
+import { familyMemberSchema, FamilyMemberFormData } from "@/app/lib/validations/family-validation";
+import { useFamilyStore } from "@/app/lib/stores/family-store";
+import { FAMILY_RELATIONSHIPS, FAMILY_COLORS, FamilyMember } from "@/app/types";
 
 interface EditFamilyMemberFormProps {
   member: FamilyMember | null;

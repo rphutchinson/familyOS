@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import { MainNav } from "@/modules/family/components/main-nav";
-import { FamilyDataProvider, setupFamilyOS } from "@/modules";
-import "@/styles/globals.css";
+import { MainNav } from "@/app/modules/family/components/main-nav";
+import { FamilyDataProvider, setupFamilyOS } from "@/app/modules";
+import "@/app/styles/globals.css";
 
 // Initialize the FamilyOS module system
 setupFamilyOS();

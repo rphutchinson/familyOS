@@ -2,14 +2,14 @@
 
 import { useState, useMemo } from "react";
 import { Plus, Zap, Heart } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/app/components/ui/card";
+import { Button } from "@/app/components/ui/button";
+import { Badge } from "@/app/components/ui/badge";
 import { ProviderCard } from "./components/provider-card";
 import { AddProviderForm } from "./components/add-provider-form";
 import { EditProviderForm } from "./components/edit-provider-form";
-import { useFamilyStore } from "@/lib/stores/family-store";
-import { HealthcareProvider } from "@/types";
+import { useFamilyStore } from "@/app/lib/stores/family-store";
+import { HealthcareProvider } from "@/app/types";
 
 export default function HealthcarePage() {
   const { familyMembers, providers, groupProvidersByFamily } = useFamilyStore();

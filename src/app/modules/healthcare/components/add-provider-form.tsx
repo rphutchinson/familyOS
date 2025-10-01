@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/app/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -12,7 +12,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
+} from "@/app/components/ui/dialog";
 import {
   Form,
   FormControl,
@@ -21,20 +21,20 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
+} from "@/app/components/ui/form";
+import { Input } from "@/app/components/ui/input";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Checkbox } from "@/components/ui/checkbox";
+} from "@/app/components/ui/select";
+import { Checkbox } from "@/app/components/ui/checkbox";
 import { Plus } from "lucide-react";
-import { providerFormSchema, ProviderFormData } from "@/lib/validations/provider-validation";
-import { useFamilyStore } from "@/lib/stores/family-store";
-import { HEALTHCARE_SPECIALTIES, HealthcareSpecialty } from "@/types";
+import { providerFormSchema, ProviderFormData } from "@/app/lib/validations/provider-validation";
+import { useFamilyStore } from "@/app/lib/stores/family-store";
+import { HEALTHCARE_SPECIALTIES, HealthcareSpecialty } from "@/app/types";
 
 interface AddProviderFormProps {
   trigger?: React.ReactNode;

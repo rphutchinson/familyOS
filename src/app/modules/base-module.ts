@@ -1,4 +1,4 @@
-import { FamilyModule, ModuleRoute, ModuleComponent } from '@/types';
+import { FamilyModule, ModuleRoute, ModuleComponent } from '@/app/types';
 
 /**
  * Base abstract class that all FamilyOS modules should extend

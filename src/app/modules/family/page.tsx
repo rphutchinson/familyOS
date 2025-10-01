@@ -2,13 +2,13 @@
 
 import { useState } from "react";
 import { Users, Plus, Settings } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/app/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/app/components/ui/card";
 import { FamilyMemberCard } from "./components/family-member-card";
 import { AddFamilyMemberForm } from "./components/add-family-member-form";
 import { EditFamilyMemberForm } from "./components/edit-family-member-form";
-import { useFamilyStore } from "@/lib/stores/family-store";
-import { FamilyMember } from "@/types";
+import { useFamilyStore } from "@/app/lib/stores/family-store";
+import { FamilyMember } from "@/app/types";
 
 export default function FamilyManagementPage() {
   const { familyMembers } = useFamilyStore();
