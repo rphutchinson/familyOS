@@ -8,9 +8,7 @@
     "start": "next start",
     "lint": "eslint",
     "update-docs": "./scripts/update-docs.sh",
-    "db:init": "tsx scripts/init-db.ts",
-    "db:fix-users": "tsx scripts/fix-user-family-ids.ts",
-    "db:diagnose": "tsx scripts/diagnose-data.ts"
+    "db:init": "tsx scripts/init-db.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.1",
