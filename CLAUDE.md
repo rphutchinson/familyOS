@@ -6,6 +6,8 @@ This document provides technical specifications and interaction guidelines for A
 
 - **Framework:** Next.js 15.5.2 with App Router and Turbopack
 - **Language:** TypeScript with strict mode for complete type safety
+- **Authentication:** Better Auth with MongoDB for user authentication
+- **Database:** MongoDB for auth data persistence
 - **Styling:** Tailwind CSS v4 with CSS variables
 - **UI Components:** shadcn/ui (New York style) with custom module patterns
 - **State Management:** Zustand with localStorage persistence and automatic migration
@@ -14,8 +16,18 @@ This document provides technical specifications and interaction guidelines for A
 
 ## Architecture Patterns
 
+### Authentication & Route Protection
+- **Better Auth**: Credentials-based authentication with email/password
+- **MongoDB Persistence**: User accounts stored in MongoDB database
+- **Protected Routes Pattern**: All routes except auth pages require authentication
+  - Protected routes are organized in `src/app/(protected)/` route group
+  - Single auth check in `(protected)/layout.tsx` protects all child routes
+  - No repetitive auth code needed in individual pages
+- **Middleware**: Initial UX redirects for unauthenticated users
+- **Server-Side Validation**: Actual session validation happens in protected layout using `requireAuth()`
+
 ### Module System
-- **Simple Route-Based Modules**: Each module is a separate route directory in `src/app/`
+- **Simple Route-Based Modules**: Each module is a separate route directory in `src/app/(protected)/`
 - **No Registration Required**: Modules are standard Next.js App Router routes
 - **Modular State Architecture**: Separate Zustand stores for core family data and individual modules
 
@@ -26,8 +38,8 @@ This document provides technical specifications and interaction guidelines for A
 - **React Context**: Family data exposed via React Context for cross-module access
 
 ### Data Storage
-- **100% Local Storage**: All data stored in browser localStorage
-- **No Backend**: Zero external services or API calls for data persistence
+- **Local Storage for App Data**: Family and module data stored in browser localStorage
+- **MongoDB for Auth**: User accounts and sessions stored in MongoDB
 - **Migration System**: Automatic data structure migrations on version changes
 - **Store Structure**:
   - `family-store`: Core family member data and preferences
@@ -101,12 +113,14 @@ npx tsc --noEmit
 
 When creating a new module:
 
-1. **Create Route Directory**: Create a new directory in `src/app/{module-name}/`
+1. **Create Route Directory**: Create a new directory in `src/app/(protected)/{module-name}/` (inside protected route group)
 2. **Define Store**: Create Zustand store in `src/lib/stores/{module-name}-store.ts` with localStorage persistence
-3. **Create Pages**: Add Next.js page components in `src/app/{module-name}/page.tsx`
-4. **Build Components**: Create module-specific components in `src/app/{module-name}/components/`
-5. **Update Navigation**: Add navigation link in `src/app/family/components/main-nav.tsx`
+3. **Create Pages**: Add Next.js page components in `src/app/(protected)/{module-name}/page.tsx`
+4. **Build Components**: Create module-specific components in `src/app/(protected)/{module-name}/components/`
+5. **Update Navigation**: Add navigation link in `src/components/main-nav.tsx`
 6. **Update Types**: Add preference types to family member preferences interface if needed
+
+**Note**: All new modules should be created inside the `(protected)` route group to automatically require authentication.
 
 ### Example Module Integration
 ```typescript
@@ -120,11 +134,13 @@ const modulePreferences = currentUser?.preferences?.moduleName;
 
 ## Privacy & Security Principles
 
-- **Local-Only Storage**: Never transmit family data to external services
-- **No Authentication**: No user accounts, registration, or login systems
-- **Transparent Storage**: All data visible in browser developer tools
+- **Authentication Required**: All routes except `/auth/signin` and `/auth/signup` require authentication
+- **Secure Credentials**: Passwords hashed with scrypt algorithm
+- **Session-Based Auth**: Better Auth handles secure session management
+- **Local Storage for App Data**: Family and module data stored locally in browser
+- **MongoDB for Auth Only**: User accounts and sessions stored in MongoDB
 - **No Analytics**: No external analytics or tracking services
-- **Sensitive Data**: Store only necessary information (no actual medical records, passwords, etc.)
+- **Sensitive Data**: Store only necessary information (no actual medical records, etc.)
 
 ## Interaction Guidelines
 
