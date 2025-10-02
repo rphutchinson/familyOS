@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
@@ -30,17 +30,21 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { familyMemberSchema, FamilyMemberFormData } from "@/lib/validations/family-validation";
-import { useFamilyStore } from "@/lib/stores/family-store";
-import { FAMILY_RELATIONSHIPS, FAMILY_COLORS, FamilyMember } from "@/types";
+import { FAMILY_RELATIONSHIPS, FAMILY_COLORS } from "@/types";
+import { updateFamilyMemberAction } from "@/actions/family-members";
+import { useRouter } from "next/navigation";
+import { FamilyMemberData } from "@/types/database";
 
 interface EditFamilyMemberFormProps {
-  member: FamilyMember | null;
+  member: FamilyMemberData | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
 export function EditFamilyMemberForm({ member, open, onOpenChange }: EditFamilyMemberFormProps) {
-  const { updateFamilyMember } = useFamilyStore();
+  const [isPending, startTransition] = useTransition();
+  const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
 
   const form = useForm<FamilyMemberFormData>({
     resolver: zodResolver(familyMemberSchema),
@@ -67,16 +71,26 @@ export function EditFamilyMemberForm({ member, open, onOpenChange }: EditFamilyM
   const onSubmit = (data: FamilyMemberFormData) => {
     if (!member) return;
 
-    try {
-      updateFamilyMember(member.id, {
-        name: data.name,
-        relationship: data.relationship,
-        color: data.color,
-      });
-      onOpenChange(false);
-    } catch (error) {
-      console.error("Failed to update family member:", error);
-    }
+    startTransition(async () => {
+      try {
+        setError(null);
+        const result = await updateFamilyMemberAction(member.id, {
+          name: data.name,
+          relationship: data.relationship,
+          color: data.color,
+        });
+
+        if (result.success) {
+          onOpenChange(false);
+          router.refresh();
+        } else {
+          setError(result.error || "Failed to update family member");
+        }
+      } catch (error) {
+        console.error("Failed to update family member:", error);
+        setError("An unexpected error occurred");
+      }
+    });
   };
 
   const handleOpenChange = (newOpen: boolean) => {
@@ -98,6 +112,11 @@ export function EditFamilyMemberForm({ member, open, onOpenChange }: EditFamilyM
         
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            {error && (
+              <div className="rounded-md bg-red-50 p-4">
+                <p className="text-sm text-red-800">{error}</p>
+              </div>
+            )}
             <FormField
               control={form.control}
               name="name"
@@ -179,14 +198,17 @@ export function EditFamilyMemberForm({ member, open, onOpenChange }: EditFamilyM
             />
 
             <DialogFooter>
-              <Button 
-                type="button" 
-                variant="outline" 
+              <Button
+                type="button"
+                variant="outline"
                 onClick={() => onOpenChange(false)}
+                disabled={isPending}
               >
                 Cancel
               </Button>
-              <Button type="submit">Save Changes</Button>
+              <Button type="submit" disabled={isPending}>
+                {isPending ? "Saving..." : "Save Changes"}
+              </Button>
             </DialogFooter>
           </form>
         </Form>

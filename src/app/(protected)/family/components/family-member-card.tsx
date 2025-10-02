@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
-import { MoreHorizontal, Edit, Trash2, Star, StarOff } from "lucide-react";
+import { useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
+import { MoreHorizontal, Edit, Trash2, Star, User } from "lucide-react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -12,38 +13,53 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { FamilyMember } from "@/types";
-import { useFamilyStore } from "@/lib/stores/family-store";
+import { FamilyMemberData } from "@/types/database";
+import { deleteFamilyMemberAction, setDefaultFamilyMemberAction } from "@/actions/family-members";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 
 interface FamilyMemberCardProps {
-  member: FamilyMember;
-  onEdit: (member: FamilyMember) => void;
+  member: FamilyMemberData;
+  onEdit: (member: FamilyMemberData) => void;
   className?: string;
 }
 
 export function FamilyMemberCard({ member, onEdit, className }: FamilyMemberCardProps) {
-  const { deleteFamilyMember, setDefaultFamilyMember, familyMembers } = useFamilyStore();
+  const router = useRouter();
+  const [isPending, startTransition] = useTransition();
   const [isDeleting, setIsDeleting] = useState(false);
 
   const handleDelete = async () => {
     setIsDeleting(true);
-    try {
-      deleteFamilyMember(member.id);
-    } catch (error) {
-      console.error("Failed to delete family member:", error);
-    } finally {
+    startTransition(async () => {
+      const result = await deleteFamilyMemberAction(member.id);
+
+      if (result.success) {
+        toast.success('Family member deleted');
+        router.refresh();
+      } else {
+        toast.error(result.error);
+      }
       setIsDeleting(false);
-    }
+    });
   };
 
   const handleToggleDefault = () => {
     if (!member.isDefault) {
-      setDefaultFamilyMember(member.id);
+      startTransition(async () => {
+        const result = await setDefaultFamilyMemberAction(member.id);
+
+        if (result.success) {
+          toast.success('Default member updated');
+          router.refresh();
+        } else {
+          toast.error(result.error);
+        }
+      });
     }
   };
 
-  const canDelete = familyMembers.length > 1;
+  const canDelete = !member.userId; // Can only delete non-user members
   const initials = member.name
     .split(' ')
     .map(word => word[0])
@@ -63,11 +79,16 @@ export function FamilyMemberCard({ member, onEdit, className }: FamilyMemberCard
               {initials}
             </div>
             <div>
-              <h3 className="font-semibold text-lg">{member.name}</h3>
+              <h3 className="font-semibold text-lg flex items-center gap-2">
+                {member.name}
+                {member.userId && (
+                  <User className="h-4 w-4 text-blue-600" title="Has account" />
+                )}
+              </h3>
               <p className="text-sm text-muted-foreground">{member.relationship}</p>
             </div>
           </div>
-          
+
           <div className="flex items-center gap-2">
             {member.isDefault && (
               <Badge variant="secondary" className="text-xs">
@@ -75,10 +96,10 @@ export function FamilyMemberCard({ member, onEdit, className }: FamilyMemberCard
                 Default
               </Badge>
             )}
-            
+
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                <Button variant="ghost" size="sm" className="h-8 w-8 p-0" disabled={isPending}>
                   <MoreHorizontal className="h-4 w-4" />
                   <span className="sr-only">Open menu</span>
                 </Button>
@@ -88,31 +109,29 @@ export function FamilyMemberCard({ member, onEdit, className }: FamilyMemberCard
                   <Edit className="h-4 w-4 mr-2" />
                   Edit
                 </DropdownMenuItem>
-                
-                {!member.isDefault && (
-                  <DropdownMenuItem onClick={handleToggleDefault}>
+
+                {!member.isDefault && member.userId && (
+                  <DropdownMenuItem onClick={handleToggleDefault} disabled={isPending}>
                     <Star className="h-4 w-4 mr-2" />
                     Set as Default
                   </DropdownMenuItem>
                 )}
-                
-                {member.isDefault && familyMembers.length > 1 && (
-                  <DropdownMenuItem onClick={handleToggleDefault} disabled>
-                    <StarOff className="h-4 w-4 mr-2" />
-                    Remove Default
-                  </DropdownMenuItem>
-                )}
-                
+
                 <DropdownMenuSeparator />
-                
+
                 <DropdownMenuItem
                   onClick={handleDelete}
-                  disabled={!canDelete || isDeleting}
+                  disabled={!canDelete || isDeleting || isPending}
                   className="text-destructive focus:text-destructive"
                 >
                   <Trash2 className="h-4 w-4 mr-2" />
                   {isDeleting ? "Deleting..." : "Delete"}
                 </DropdownMenuItem>
+                {!canDelete && (
+                  <p className="text-xs text-muted-foreground px-2 py-1">
+                    Cannot delete members with accounts
+                  </p>
+                )}
               </DropdownMenuContent>
             </DropdownMenu>
           </div>

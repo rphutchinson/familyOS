@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { MainNav } from "@/components/main-nav";
 import { FamilyDataProvider } from "@/app/(protected)/family/family-context";
+import { Toaster } from "sonner";
 import "@/styles/globals.css";
 
 const geistSans = Geist({
@@ -33,6 +34,7 @@ export default function RootLayout({
           <MainNav />
           <main>{children}</main>
         </FamilyDataProvider>
+        <Toaster position="top-right" richColors />
       </body>
     </html>
   );

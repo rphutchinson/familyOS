@@ -4,6 +4,7 @@ import { getSessionCookie } from "better-auth/cookies";
 export async function middleware(request: NextRequest) {
   const sessionCookie = getSessionCookie(request);
   const isAuthPage = request.nextUrl.pathname.startsWith("/auth");
+  const isOnboardingPage = request.nextUrl.pathname.startsWith("/onboarding");
 
   // If no session and not on auth page, redirect to sign-in
   if (!sessionCookie && !isAuthPage) {
@@ -14,6 +15,9 @@ export async function middleware(request: NextRequest) {
   if (sessionCookie && isAuthPage) {
     return NextResponse.redirect(new URL("/", request.url));
   }
+
+  // Note: Family check is handled in requireAuthWithFamily() in protected layout
+  // Onboarding page will handle its own redirects
 
   return NextResponse.next();
 }

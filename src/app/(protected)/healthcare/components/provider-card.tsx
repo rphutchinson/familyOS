@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useTransition } from "react";
 import { ExternalLink, MoreHorizontal, Edit, Trash2, User, Clock } from "lucide-react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -12,34 +12,42 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { HealthcareProvider, FamilyMember } from "@/types";
-import { useFamilyStore } from "@/lib/stores/family-store";
 import { cn } from "@/lib/utils";
+import { deleteProviderAction, markProviderUsedAction } from "@/actions/providers";
+import { useRouter } from "next/navigation";
+import { HealthcareProviderData, FamilyMemberData } from "@/types/database";
 
 interface ProviderCardProps {
-  provider: HealthcareProvider;
-  familyMembers: FamilyMember[];
-  onEdit: (provider: HealthcareProvider) => void;
+  provider: HealthcareProviderData;
+  familyMembers: FamilyMemberData[];
+  onEdit: (provider: HealthcareProviderData) => void;
   className?: string;
 }
 
 export function ProviderCard({ provider, familyMembers, onEdit, className }: ProviderCardProps) {
-  const { deleteProvider, markProviderUsed } = useFamilyStore();
-  const [isDeleting, setIsDeleting] = useState(false);
+  const [isPending, startTransition] = useTransition();
+  const router = useRouter();
 
   const handleDelete = async () => {
-    setIsDeleting(true);
-    try {
-      deleteProvider(provider.id);
-    } catch (error) {
-      console.error("Failed to delete provider:", error);
-    } finally {
-      setIsDeleting(false);
-    }
+    if (!confirm("Are you sure you want to delete this provider?")) return;
+
+    startTransition(async () => {
+      try {
+        const result = await deleteProviderAction(provider.id);
+        if (result.success) {
+          router.refresh();
+        } else {
+          console.error("Failed to delete provider:", result.error);
+        }
+      } catch (error) {
+        console.error("Failed to delete provider:", error);
+      }
+    });
   };
 
-  const handlePortalClick = () => {
-    markProviderUsed(provider.id);
+  const handlePortalClick = async () => {
+    // Mark as used (non-blocking)
+    markProviderUsedAction(provider.id).catch(console.error);
     window.open(provider.portalUrl, '_blank');
   };
 
@@ -97,11 +105,11 @@ export function ProviderCard({ provider, familyMembers, onEdit, className }: Pro
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
                   onClick={handleDelete}
-                  disabled={isDeleting}
+                  disabled={isPending}
                   className="text-destructive focus:text-destructive"
                 >
                   <Trash2 className="h-4 w-4 mr-2" />
-                  {isDeleting ? "Deleting..." : "Delete"}
+                  {isPending ? "Deleting..." : "Delete"}
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>

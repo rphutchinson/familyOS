@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
@@ -31,17 +31,22 @@ import {
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { providerFormSchema, ProviderFormData } from "@/lib/validations/provider-validation";
-import { useFamilyStore } from "@/lib/stores/family-store";
-import { HEALTHCARE_SPECIALTIES, HealthcareProvider, HealthcareSpecialty } from "@/types";
+import { HEALTHCARE_SPECIALTIES, HealthcareSpecialty } from "@/types";
+import { updateProviderAction } from "@/actions/providers";
+import { useRouter } from "next/navigation";
+import { HealthcareProviderData, FamilyMemberData } from "@/types/database";
 
 interface EditProviderFormProps {
-  provider: HealthcareProvider | null;
+  provider: HealthcareProviderData | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  familyMembers: FamilyMemberData[];
 }
 
-export function EditProviderForm({ provider, open, onOpenChange }: EditProviderFormProps) {
-  const { updateProvider, familyMembers } = useFamilyStore();
+export function EditProviderForm({ provider, open, onOpenChange, familyMembers }: EditProviderFormProps) {
+  const [isPending, startTransition] = useTransition();
+  const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
 
   const form = useForm<ProviderFormData>({
     resolver: zodResolver(providerFormSchema),
@@ -72,25 +77,36 @@ export function EditProviderForm({ provider, open, onOpenChange }: EditProviderF
   const onSubmit = (data: ProviderFormData) => {
     if (!provider) return;
 
-    try {
-      updateProvider(provider.id, {
-        providerName: data.providerName,
-        portalUrl: data.portalUrl,
-        specialty: data.specialty as HealthcareSpecialty,
-        familyMemberIds: data.familyMemberIds,
-        loginUsername: data.loginUsername || undefined,
-        notes: data.notes || undefined,
-      });
-      onOpenChange(false);
-    } catch (error) {
-      console.error("Failed to update provider:", error);
-    }
+    startTransition(async () => {
+      try {
+        setError(null);
+        const result = await updateProviderAction(provider.id, {
+          providerName: data.providerName,
+          portalUrl: data.portalUrl,
+          specialty: data.specialty as HealthcareSpecialty,
+          familyMemberIds: data.familyMemberIds,
+          loginUsername: data.loginUsername || undefined,
+          notes: data.notes || undefined,
+        });
+
+        if (result.success) {
+          onOpenChange(false);
+          router.refresh();
+        } else {
+          setError(result.error || "Failed to update provider");
+        }
+      } catch (error) {
+        console.error("Failed to update provider:", error);
+        setError("An unexpected error occurred");
+      }
+    });
   };
 
   const handleOpenChange = (newOpen: boolean) => {
     onOpenChange(newOpen);
     if (!newOpen) {
       form.reset();
+      setError(null);
     }
   };
 
@@ -106,6 +122,11 @@ export function EditProviderForm({ provider, open, onOpenChange }: EditProviderF
         
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            {error && (
+              <div className="rounded-md bg-red-50 p-4">
+                <p className="text-sm text-red-800">{error}</p>
+              </div>
+            )}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormField
                 control={form.control}
@@ -263,14 +284,17 @@ export function EditProviderForm({ provider, open, onOpenChange }: EditProviderF
             />
 
             <DialogFooter>
-              <Button 
-                type="button" 
-                variant="outline" 
+              <Button
+                type="button"
+                variant="outline"
                 onClick={() => onOpenChange(false)}
+                disabled={isPending}
               >
                 Cancel
               </Button>
-              <Button type="submit">Save Changes</Button>
+              <Button type="submit" disabled={isPending}>
+                {isPending ? "Saving..." : "Save Changes"}
+              </Button>
             </DialogFooter>
           </form>
         </Form>

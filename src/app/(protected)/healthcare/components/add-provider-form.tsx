@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
@@ -33,16 +33,22 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { Plus } from "lucide-react";
 import { providerFormSchema, ProviderFormData } from "@/lib/validations/provider-validation";
-import { useFamilyStore } from "@/lib/stores/family-store";
 import { HEALTHCARE_SPECIALTIES, HealthcareSpecialty } from "@/types";
+import { createProviderAction } from "@/actions/providers";
+import { getDefaultFamilyMemberAction } from "@/actions/family-members";
+import { useRouter } from "next/navigation";
+import { FamilyMemberData } from "@/types/database";
 
 interface AddProviderFormProps {
   trigger?: React.ReactNode;
+  familyMembers: FamilyMemberData[];
 }
 
-export function AddProviderForm({ trigger }: AddProviderFormProps) {
+export function AddProviderForm({ trigger, familyMembers }: AddProviderFormProps) {
   const [open, setOpen] = useState(false);
-  const { addProvider, familyMembers, getDefaultFamilyMember } = useFamilyStore();
+  const [isPending, startTransition] = useTransition();
+  const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
 
   const form = useForm<ProviderFormData>({
     resolver: zodResolver(providerFormSchema),
@@ -57,34 +63,47 @@ export function AddProviderForm({ trigger }: AddProviderFormProps) {
   });
 
   // Set default family member when form opens
-  const handleOpenChange = (newOpen: boolean) => {
+  const handleOpenChange = async (newOpen: boolean) => {
     setOpen(newOpen);
     if (newOpen) {
-      const defaultMember = getDefaultFamilyMember();
-      if (defaultMember) {
-        form.setValue("familyMemberIds", [defaultMember.id]);
+      const result = await getDefaultFamilyMemberAction();
+      if (result.success && result.data) {
+        form.setValue("familyMemberIds", [result.data.id]);
       } else {
         form.setValue("familyMemberIds", []);
       }
     } else {
       form.reset();
+      setError(null);
     }
   };
 
   const onSubmit = (data: ProviderFormData) => {
-    try {
-      addProvider({
-        ...data,
-        specialty: data.specialty as HealthcareSpecialty,
-        loginUsername: data.loginUsername || undefined,
-        notes: data.notes || undefined,
-        autoDetected: false,
-      });
-      setOpen(false);
-      form.reset();
-    } catch (error) {
-      console.error("Failed to add provider:", error);
-    }
+    startTransition(async () => {
+      try {
+        setError(null);
+        const result = await createProviderAction({
+          providerName: data.providerName,
+          portalUrl: data.portalUrl,
+          specialty: data.specialty as HealthcareSpecialty,
+          familyMemberIds: data.familyMemberIds,
+          loginUsername: data.loginUsername || undefined,
+          notes: data.notes || undefined,
+          autoDetected: false,
+        });
+
+        if (result.success) {
+          setOpen(false);
+          form.reset();
+          router.refresh();
+        } else {
+          setError(result.error || "Failed to add provider");
+        }
+      } catch (error) {
+        console.error("Failed to add provider:", error);
+        setError("An unexpected error occurred");
+      }
+    });
   };
 
   const defaultTrigger = (
@@ -110,6 +129,11 @@ export function AddProviderForm({ trigger }: AddProviderFormProps) {
         
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            {error && (
+              <div className="rounded-md bg-red-50 p-4">
+                <p className="text-sm text-red-800">{error}</p>
+              </div>
+            )}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormField
                 control={form.control}
@@ -279,14 +303,15 @@ export function AddProviderForm({ trigger }: AddProviderFormProps) {
                 type="button"
                 variant="outline"
                 onClick={() => setOpen(false)}
+                disabled={isPending}
               >
                 Cancel
               </Button>
               <Button
                 type="submit"
-                disabled={familyMembers.length === 0}
+                disabled={familyMembers.length === 0 || isPending}
               >
-                Add Provider
+                {isPending ? "Adding..." : "Add Provider"}
               </Button>
             </DialogFooter>
           </form>

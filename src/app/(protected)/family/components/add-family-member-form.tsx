@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
@@ -32,8 +32,9 @@ import {
 } from "@/components/ui/select";
 import { Plus } from "lucide-react";
 import { familyMemberSchema, FamilyMemberFormData } from "@/lib/validations/family-validation";
-import { useFamilyStore } from "@/lib/stores/family-store";
 import { FAMILY_RELATIONSHIPS, FAMILY_COLORS } from "@/types";
+import { createFamilyMemberAction, getAvailableColorAction } from "@/actions/family-members";
+import { useRouter } from "next/navigation";
 
 interface AddFamilyMemberFormProps {
   trigger?: React.ReactNode;
@@ -41,7 +42,9 @@ interface AddFamilyMemberFormProps {
 
 export function AddFamilyMemberForm({ trigger }: AddFamilyMemberFormProps) {
   const [open, setOpen] = useState(false);
-  const { addFamilyMember, getAvailableColor } = useFamilyStore();
+  const [isPending, startTransition] = useTransition();
+  const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
 
   const form = useForm<FamilyMemberFormData>({
     resolver: zodResolver(familyMemberSchema),
@@ -54,27 +57,41 @@ export function AddFamilyMemberForm({ trigger }: AddFamilyMemberFormProps) {
   });
 
   // Set default color when form opens
-  const handleOpenChange = (newOpen: boolean) => {
+  const handleOpenChange = async (newOpen: boolean) => {
     setOpen(newOpen);
     if (newOpen) {
-      const availableColor = getAvailableColor();
-      form.setValue("color", availableColor);
+      const result = await getAvailableColorAction();
+      if (result.success && result.data) {
+        form.setValue("color", result.data);
+      }
     } else {
       form.reset();
     }
   };
 
   const onSubmit = (data: FamilyMemberFormData) => {
-    try {
-      addFamilyMember({
-        ...data,
-        isDefault: data.isDefault ?? false
-      });
-      setOpen(false);
-      form.reset();
-    } catch (error) {
-      console.error("Failed to add family member:", error);
-    }
+    startTransition(async () => {
+      try {
+        setError(null);
+        const result = await createFamilyMemberAction({
+          name: data.name,
+          relationship: data.relationship,
+          color: data.color,
+          isDefault: data.isDefault ?? false,
+        });
+
+        if (result.success) {
+          setOpen(false);
+          form.reset();
+          router.refresh();
+        } else {
+          setError(result.error || "Failed to add family member");
+        }
+      } catch (error) {
+        console.error("Failed to add family member:", error);
+        setError("An unexpected error occurred");
+      }
+    });
   };
 
   const defaultTrigger = (
@@ -100,6 +117,11 @@ export function AddFamilyMemberForm({ trigger }: AddFamilyMemberFormProps) {
         
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            {error && (
+              <div className="rounded-md bg-red-50 p-4">
+                <p className="text-sm text-red-800">{error}</p>
+              </div>
+            )}
             <FormField
               control={form.control}
               name="name"
@@ -181,14 +203,17 @@ export function AddFamilyMemberForm({ trigger }: AddFamilyMemberFormProps) {
             />
 
             <DialogFooter>
-              <Button 
-                type="button" 
-                variant="outline" 
+              <Button
+                type="button"
+                variant="outline"
                 onClick={() => setOpen(false)}
+                disabled={isPending}
               >
                 Cancel
               </Button>
-              <Button type="submit">Add Family Member</Button>
+              <Button type="submit" disabled={isPending}>
+                {isPending ? "Adding..." : "Add Family Member"}
+              </Button>
             </DialogFooter>
           </form>
         </Form>
