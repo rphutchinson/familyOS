@@ -25,43 +25,58 @@ This document provides technical specifications and interaction guidelines for A
   - No repetitive auth code needed in individual pages
 - **Middleware**: Initial UX redirects for unauthenticated users
 - **Server-Side Validation**: Actual session validation happens in protected layout using `requireAuth()`
+- **Family-Based Authorization**: `requireAuthWithFamily()` helper ensures family data isolation
 
 ### Module System
 - **Simple Route-Based Modules**: Each module is a separate route directory in `src/app/(protected)/`
 - **No Registration Required**: Modules are standard Next.js App Router routes
 - **Modular State Architecture**: Separate Zustand stores for core family data and individual modules
 
-### State Management
-- **Zustand Stores**: Located in `src/lib/stores/` directory
-- **Persistence Layer**: Automatic localStorage persistence with version migration
-- **State Versioning**: Each store includes a version number for migration support
-- **React Context**: Family data exposed via React Context for cross-module access
-
-### Data Storage
-- **Local Storage for App Data**: Family and module data stored in browser localStorage
-- **MongoDB for Auth**: User accounts and sessions stored in MongoDB
-- **Migration System**: Automatic data structure migrations on version changes
-- **Store Structure**:
-  - `family-store`: Core family member data and preferences
-  - `healthcare-store`: Healthcare module-specific data
-  - `app-store`: App-level settings and configuration
-  - Additional stores per module as needed
+### Data Persistence & State Management
+- **MongoDB Collections**: Primary data storage for families, family members, and healthcare providers
+  - `families`: Family information, settings, and invite codes
+  - `family_members`: Individual family member records with optional user account links
+  - `healthcare_providers`: Healthcare provider portal information linked to family members
+- **Server Actions**: Type-safe data mutations located in `src/app/actions/`
+  - `family.ts`: Family CRUD operations and invite system
+  - `family-members.ts`: Family member management
+  - `providers.ts`: Healthcare provider operations
+  - All actions include automatic family isolation and authorization
+- **Server Components**: Pages fetch data directly from MongoDB via Server Actions
+- **Client Components**: Interactive UI components receive data as props from Server Components
+- **Legacy Zustand Stores** (being phased out):
+  - Some components still use localStorage-based stores
+  - New features should use Server Actions and MongoDB
+  - Located in `src/lib/stores/` directory
 
 ## Key File Locations
 
-### Core System
-- **App Store**: `src/lib/stores/app-store.ts`
-- **Family Store**: `src/lib/stores/family-store.ts`
-- **Family Context**: `src/app/family/family-context.tsx`
-- **Main Navigation**: `src/app/family/components/main-nav.tsx`
+### Database Layer
+- **Database Utilities**: `src/lib/db/`
+  - `families.ts`: Family CRUD operations
+  - `family-members.ts`: Family member operations
+  - `providers.ts`: Healthcare provider operations
+  - `init-indexes.ts`: Database index creation
+- **Type Definitions**: `src/types/database.ts`
 
-### Healthcare Module
-- **Healthcare Store**: `src/lib/stores/healthcare-store.ts`
-- **Healthcare Routes**: `src/app/healthcare/`
-- **Provider Components**: `src/app/healthcare/components/`
+### Server Actions
+- **Family Actions**: `src/actions/family.ts`
+- **Family Member Actions**: `src/actions/family-members.ts`
+- **Provider Actions**: `src/actions/providers.ts`
+- **Migration Actions**: `src/actions/migration.ts`
+
+### Authentication & Authorization
+- **Auth Config**: `src/lib/auth.ts`
+- **Auth Helpers**: `src/lib/auth-utils.ts` (`requireAuth`, `requireAuthWithFamily`)
+
+### Core Pages
+- **Onboarding**: `src/app/(protected)/onboarding/`
+- **Family Management**: `src/app/(protected)/family/`
+- **Family Settings**: `src/app/(protected)/family/settings/`
+- **Healthcare Module**: `src/app/(protected)/healthcare/`
+- **Main Navigation**: `src/components/main-nav.tsx`
 
 ### Shared Components
-- **Family Member Selector**: `src/app/family/components/family-member-selector.tsx`
 - **UI Components**: `src/components/ui/` (shadcn/ui components)
 
 ## Development Commands
@@ -92,16 +107,18 @@ npx tsc --noEmit
 - Export types alongside implementations
 
 ### Component Patterns
-- Use functional components with hooks
+- **Server Components**: Default for pages - fetch data directly from MongoDB via Server Actions
+- **Client Components**: Mark with `"use client"` only when needed for interactivity
 - Prefer composition over prop drilling
-- Use React Context for cross-cutting concerns (family data)
-- Module-specific components in `src/app/{module-name}/components/`
+- Pass data from Server Components to Client Components as props
+- Module-specific components in `src/app/(protected)/{module-name}/components/`
 
-### State Management
-- Use Zustand for complex state management
-- Use React hooks (useState, useReducer) for local component state
-- Persist important data to localStorage via Zustand middleware
-- Include migration logic when changing store structure
+### Data Management Patterns
+- **Server Actions for Mutations**: All data modifications go through Server Actions
+- **Server Components for Data Fetching**: Pages fetch data server-side
+- **router.refresh()**: Use after mutations to refresh Server Component data
+- **useTransition**: Wrap Server Action calls for pending states
+- Use React hooks (useState, useReducer) for local component state only
 
 ### Styling
 - Use Tailwind utility classes
@@ -113,23 +130,64 @@ npx tsc --noEmit
 
 When creating a new module:
 
-1. **Create Route Directory**: Create a new directory in `src/app/(protected)/{module-name}/` (inside protected route group)
-2. **Define Store**: Create Zustand store in `src/lib/stores/{module-name}-store.ts` with localStorage persistence
-3. **Create Pages**: Add Next.js page components in `src/app/(protected)/{module-name}/page.tsx`
-4. **Build Components**: Create module-specific components in `src/app/(protected)/{module-name}/components/`
-5. **Update Navigation**: Add navigation link in `src/components/main-nav.tsx`
-6. **Update Types**: Add preference types to family member preferences interface if needed
+1. **Create Route Directory**: Create directory in `src/app/(protected)/{module-name}/` (inside protected route group)
+2. **Create Server Component Page**: Add page in `src/app/(protected)/{module-name}/page.tsx`
+   - Fetch data using Server Actions
+   - Pass data to Client Component wrapper
+3. **Create Client Component Wrapper**: Add `{module-name}-page-client.tsx` for interactive UI
+   - Receives data as props from Server Component
+   - Handles user interactions
+   - Calls Server Actions for mutations
+4. **Add Server Actions**: Create actions in `src/actions/{module-name}.ts`
+   - Use `requireAuthWithFamily()` for authorization
+   - Include `revalidatePath()` after mutations
+5. **Build Components**: Create module-specific components in `src/app/(protected)/{module-name}/components/`
+6. **Update Navigation**: Add navigation link in `src/components/main-nav.tsx`
+7. **Update Types**: Add types to `src/types/database.ts` if needed
 
 **Note**: All new modules should be created inside the `(protected)` route group to automatically require authentication.
 
-### Example Module Integration
+### Example Server Component Page
 ```typescript
-// Import family context in your module
-import { useFamilyData } from '@/app/family/family-context';
+// src/app/(protected)/module-name/page.tsx
+import { getModuleDataAction } from '@/actions/module-name';
+import { ModulePageClient } from './module-page-client';
 
-// Use in your component
-const { familyMembers, currentUser } = useFamilyData();
-const modulePreferences = currentUser?.preferences?.moduleName;
+export default async function ModulePage() {
+  const result = await getModuleDataAction();
+
+  if (!result.success) {
+    // Handle error
+  }
+
+  return <ModulePageClient data={result.data} />;
+}
+```
+
+### Example Client Component
+```typescript
+// src/app/(protected)/module-name/module-page-client.tsx
+"use client";
+
+import { useTransition } from "react";
+import { useRouter } from "next/navigation";
+import { updateModuleDataAction } from "@/actions/module-name";
+
+export function ModulePageClient({ data }) {
+  const [isPending, startTransition] = useTransition();
+  const router = useRouter();
+
+  const handleUpdate = async () => {
+    startTransition(async () => {
+      const result = await updateModuleDataAction({ /* ... */ });
+      if (result.success) {
+        router.refresh(); // Refresh Server Component data
+      }
+    });
+  };
+
+  return <div>{/* Interactive UI */}</div>;
+}
 ```
 
 ## Privacy & Security Principles
@@ -137,10 +195,12 @@ const modulePreferences = currentUser?.preferences?.moduleName;
 - **Authentication Required**: All routes except `/auth/signin` and `/auth/signup` require authentication
 - **Secure Credentials**: Passwords hashed with scrypt algorithm
 - **Session-Based Auth**: Better Auth handles secure session management
-- **Local Storage for App Data**: Family and module data stored locally in browser
-- **MongoDB for Auth Only**: User accounts and sessions stored in MongoDB
+- **MongoDB for All Data**: User accounts, families, family members, and module data stored in MongoDB
+- **Family Isolation**: All queries automatically scoped to user's family via `requireAuthWithFamily()`
+- **Server-Side Authorization**: All data access validated server-side before operations
 - **No Analytics**: No external analytics or tracking services
 - **Sensitive Data**: Store only necessary information (no actual medical records, etc.)
+- **Multi-User Support**: Multiple users can belong to same family with proper data isolation
 
 ## Interaction Guidelines
 
