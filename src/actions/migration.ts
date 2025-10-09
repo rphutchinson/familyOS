@@ -45,7 +45,7 @@ export async function migrateFamilyDataAction(
     }
 
     // Create family
-    const familyName = `${session.user.name}'s Family` || 'My Family';
+    const familyName = session.user.name ? `${session.user.name}'s Family` : 'My Family';
     const family = await createFamily({
       name: familyName,
       ownerId: session.user.id,
@@ -148,7 +148,7 @@ export async function createMinimalFamilyAction(): Promise<ActionResult<string>>
     }
 
     // Create family
-    const familyName = `${session.user.name}'s Family` || 'My Family';
+    const familyName = session.user.name ? `${session.user.name}'s Family` : 'My Family';
     const family = await createFamily({
       name: familyName,
       ownerId: session.user.id,

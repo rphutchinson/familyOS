@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { updateFamilyAction, getInviteCodeAction, regenerateInviteCodeAction } from '@/actions/family';
+import { updateFamilyAction, regenerateInviteCodeAction } from '@/actions/family';
 import { Family, FamilyMemberData } from '@/types/database';
 import { Users, Copy, RefreshCw, Check } from 'lucide-react';
 
@@ -66,7 +66,7 @@ export function FamilySettingsClient({ family, isOwner, members }: FamilySetting
       await navigator.clipboard.writeText(inviteCode);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
-    } catch (err) {
+    } catch {
       setError('Failed to copy invite code');
     }
   };

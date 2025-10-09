@@ -75,7 +75,7 @@ export function useProviders() {
   };
 
   // Quick add functionality for browser integration
-  const quickAddProvider = (url: string, detectedData?: any) => {
+  const quickAddProvider = (url: string, detectedData?: { siteName?: string; favicon?: string }) => {
     const newProvider: Omit<Provider, 'id' | 'createdAt' | 'updatedAt'> = {
       name: detectedData?.siteName || 'New Provider',
       providerName: detectedData?.siteName || 'New Provider',

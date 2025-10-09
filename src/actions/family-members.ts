@@ -123,7 +123,7 @@ export async function updateFamilyMemberAction(
  */
 export async function deleteFamilyMemberAction(memberId: string): Promise<ActionResult<void>> {
   try {
-    const { session, familyId } = await requireAuthWithFamily();
+    const { familyId } = await requireAuthWithFamily();
 
     // Verify the member belongs to this family
     const member = await getFamilyMemberById(memberId);

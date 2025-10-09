@@ -4,7 +4,6 @@ import { revalidatePath } from 'next/cache';
 import { requireAuth, requireAuthWithFamily, updateUserFamilyId, getUserFamilyId } from '@/lib/auth-utils';
 import {
   createFamily,
-  getFamilyById,
   findFamilyByInviteCode,
   updateFamily,
   regenerateInviteCode,

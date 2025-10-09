@@ -62,6 +62,7 @@ export interface FamilyPreferences {
 
 export interface FamilyMemberMetadata {
   // Extensible metadata for future modules
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [key: string]: any;
 }
 
@@ -176,12 +177,14 @@ export interface ModuleRoute {
 export interface ModuleComponent {
   name: string;
   component: React.ComponentType | null;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   props?: Record<string, any>;
 }
 
 export interface FamilyModule {
   id: string;
   name: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   icon: any; // LucideIcon type - will be imported where used
   description: string;
   version: string;

@@ -3,7 +3,7 @@ import { getFamilyMembers } from '@/lib/db/family-members';
 import { FamilyPageClient } from './family-page-client';
 
 export default async function FamilyManagementPage() {
-  const { session, family, familyId } = await requireAuthWithFamily();
+  const { family, familyId } = await requireAuthWithFamily();
   const members = await getFamilyMembers(familyId);
 
   return (

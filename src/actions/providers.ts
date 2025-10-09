@@ -6,7 +6,6 @@ import {
   createProvider,
   getProviders,
   getProviderById,
-  getProvidersByFamilyMember,
   updateProvider,
   deleteProvider,
   markProviderUsed,
@@ -72,7 +71,6 @@ export async function groupProvidersByFamilyAction(): Promise<ActionResult<Famil
             quickAddData: provider.quickAddData,
             createdAt: provider.createdAt,
             updatedAt: provider.updatedAt,
-            createdBy: provider.createdBy,
           })
         ),
     }));

@@ -33,6 +33,7 @@ export function familyDocumentToFamily(doc: FamilyDocument): Family {
 export function generateInviteCode(): string {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // Removed ambiguous characters
   let code = '';
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
   const crypto = require('crypto');
   const bytes = crypto.randomBytes(8);
 

@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { createFamilyAction, joinFamilyAction } from '@/actions/family';
-import { checkMigrationNeededAction, migrateFamilyDataAction, createMinimalFamilyAction } from '@/actions/migration';
+import { migrateFamilyDataAction, createMinimalFamilyAction } from '@/actions/migration';
 import { Users, UserPlus } from 'lucide-react';
 
 interface OnboardingClientProps {
@@ -174,7 +174,7 @@ export function OnboardingClient({ userName }: OnboardingClientProps) {
         <CardHeader>
           <CardTitle>Welcome to FamilyOS, {userName}!</CardTitle>
           <CardDescription>
-            Let's set up your family. Choose an option below to get started.
+            Let&apos;s set up your family. Choose an option below to get started.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">

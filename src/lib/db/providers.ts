@@ -121,19 +121,36 @@ export async function getProvidersByFamilyMember(
 }
 
 /**
- * Update provider
+ * Update parameters that accept string IDs
+ */
+type UpdateProviderInput = Partial<{
+  providerName: string;
+  portalUrl: string;
+  specialty: HealthcareProviderDocument['specialty'];
+  familyMemberIds: string[]; // Accepts string IDs, will be converted to ObjectIds
+  loginUsername: string;
+  notes: string;
+  lastUsed: Date;
+  autoDetected: boolean;
+  quickAddData: HealthcareProviderDocument['quickAddData'];
+  updatedAt: Date;
+}>;
+
+/**
+ * Update provider - accepts string IDs and converts to ObjectIds
  */
 export async function updateProvider(
   providerId: string,
-  updates: Partial<Omit<HealthcareProviderDocument, '_id' | 'familyId' | 'createdAt' | 'createdBy'>>
+  updates: UpdateProviderInput
 ): Promise<void> {
   const collection = await getProvidersCollection();
 
-  // Convert familyMemberIds strings to ObjectIds if present
-  const processedUpdates = { ...updates };
+  // Build update object, converting familyMemberIds strings to ObjectIds if present
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const processedUpdates: any = { ...updates };
   if (updates.familyMemberIds) {
     processedUpdates.familyMemberIds = updates.familyMemberIds.map(
-      (id) => new ObjectId(id as unknown as string)
+      (id) => new ObjectId(id)
     );
   }
 

@@ -82,7 +82,7 @@ export function FamilyMemberCard({ member, onEdit, className }: FamilyMemberCard
               <h3 className="font-semibold text-lg flex items-center gap-2">
                 {member.name}
                 {member.userId && (
-                  <User className="h-4 w-4 text-blue-600" title="Has account" />
+                  <User className="h-4 w-4 text-blue-600" aria-label="Has account" />
                 )}
               </h3>
               <p className="text-sm text-muted-foreground">{member.relationship}</p>

@@ -16,13 +16,13 @@ export default async function HealthcarePage() {
     redirect("/family");
   }
 
+  const familyMembers = familyMembersResult.data || [];
+  const providers = providersResult.success ? providersResult.data : [];
+
   if (!providersResult.success) {
     console.error("Failed to fetch providers:", providersResult.error);
     // Continue with empty providers instead of redirecting
   }
-
-  const familyMembers = familyMembersResult.data || [];
-  const providers = providersResult.data || [];
 
   return <HealthcarePageClient familyMembers={familyMembers} providers={providers} />;
 }
