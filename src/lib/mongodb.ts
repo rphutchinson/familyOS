@@ -1,11 +1,26 @@
 import { MongoClient } from "mongodb";
 
-if (!process.env.MONGODB_URI) {
-  throw new Error('Invalid/Missing environment variable: "MONGODB_URI"');
+// Support both full MONGODB_URI or individual components
+let uri: string;
+if (process.env.MONGODB_URI) {
+  uri = process.env.MONGODB_URI;
+} else if (
+  process.env.MONGODB_USERNAME &&
+  process.env.MONGODB_PASSWORD &&
+  process.env.MONGODB_DATABASE
+) {
+  // Build URI from individual components
+  const username = process.env.MONGODB_USERNAME;
+  const password = process.env.MONGODB_PASSWORD;
+  const database = process.env.MONGODB_DATABASE;
+  const host = process.env.MONGODB_HOST || 'localhost';
+  const port = process.env.MONGODB_PORT || '27017';
+  uri = `mongodb://${username}:${password}@${host}:${port}/${database}?authSource=admin`;
+} else {
+  throw new Error('Invalid/Missing environment variable: "MONGODB_URI" or MongoDB connection components');
 }
 
-const uri = process.env.MONGODB_URI;
-const dbName = process.env.MONGODB_DB_NAME;
+const dbName = process.env.MONGODB_DATABASE;
 const options = {};
 
 // Create the client - connection will be established on first use
