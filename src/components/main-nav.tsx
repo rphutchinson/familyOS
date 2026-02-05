@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Home, Users, Heart, Menu, LogOut, User } from "lucide-react";
+import { Home, Users, Heart, Menu, LogOut, User, CheckSquare } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
@@ -19,6 +19,11 @@ const navigation = [
     name: "Dashboard",
     href: "/",
     icon: Home,
+  },
+  {
+    name: "Todos",
+    href: "/todos",
+    icon: CheckSquare,
   },
   {
     name: "Healthcare",

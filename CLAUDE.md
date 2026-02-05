@@ -226,3 +226,10 @@ export function ModulePageClient({ data }) {
 ---
 
 **Note**: For product requirements, features, and roadmap information, see [README.md](README.md)
+
+## Active Technologies
+- TypeScript (strict mode) with Next.js 15.5.2 + Next.js App Router, Better Auth, MongoDB driver, Zustand (legacy, being phased out), Tailwind CSS v4, shadcn/ui (New York style), Lucide Reac (001-todolist-module)
+- MongoDB with family-based isolation pattern (001-todolist-module)
+
+## Recent Changes
+- 001-todolist-module: Added TypeScript (strict mode) with Next.js 15.5.2 + Next.js App Router, Better Auth, MongoDB driver, Zustand (legacy, being phased out), Tailwind CSS v4, shadcn/ui (New York style), Lucide Reac

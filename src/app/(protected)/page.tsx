@@ -1,14 +1,23 @@
-"use client";
-
 import { Users, Heart, Plus, Calendar, DollarSign } from "lucide-react";
 import Link from "next/link";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { useFamilyStore } from "@/lib/stores/family-store";
+import { getFamilyMembersAction } from "@/actions/family-members";
+import { getProvidersAction } from "@/actions/providers";
+import { getActiveTodoCountAction } from "@/actions/todos";
 
-export default function Dashboard() {
-  const { familyMembers, providers } = useFamilyStore();
+export default async function Dashboard() {
+  // Fetch data from server
+  const [membersResult, providersResult, todoCountResult] = await Promise.all([
+    getFamilyMembersAction(),
+    getProvidersAction(),
+    getActiveTodoCountAction(),
+  ]);
+
+  const familyMembers = membersResult.success ? membersResult.data : [];
+  const providers = providersResult.success ? providersResult.data : [];
+  const todoCount = todoCountResult.success ? todoCountResult.data : 0;
 
   const modules = [
     {
@@ -24,10 +33,10 @@ export default function Dashboard() {
       name: "Tasks & Todos",
       description: "Family task coordination and assignments",
       icon: Plus,
-      href: "/tasks",
-      count: 0,
+      href: "/todos",
+      count: todoCount,
       color: "bg-blue-50 text-blue-600 border-blue-200",
-      available: false
+      available: true
     },
     {
       name: "Calendar",

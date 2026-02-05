@@ -7,6 +7,23 @@
 
 ## User Scenarios & Testing *(mandatory)*
 
+### User Story 0 - Dashboard Access (Priority: P0) 🚪 Entry Point
+
+Family members need to discover and access the todo module from the main dashboard to begin using the feature.
+
+**Why this priority**: This is P0 (highest priority) because without dashboard integration, users cannot discover or access the feature. This is the entry point for all other user stories.
+
+**Independent Test**: Can be tested by navigating to the dashboard and verifying the todo module card is visible, shows the correct todo count, and links to the correct route.
+
+**Acceptance Scenarios**:
+
+1. **Given** a user is on the dashboard, **When** they view the modules grid, **Then** they see a "Tasks & Todos" module card marked as available
+2. **Given** the user has active todos, **When** they view the dashboard, **Then** the todo module card displays the count of active (non-completed) todos
+3. **Given** a user clicks on the todo module card, **When** the navigation completes, **Then** they are directed to `/todos` route
+4. **Given** a user has no todos yet, **When** they view the dashboard, **Then** the todo module card shows count of 0 and is still accessible
+
+---
+
 ### User Story 1 - Create and View Todo Items (Priority: P1)
 
 Family members need to create todo items and see all tasks in a centralized list to coordinate family activities and responsibilities.
@@ -87,6 +104,7 @@ Family members need to edit task details or remove tasks that are no longer rele
 
 ### Functional Requirements
 
+- **FR-000**: System MUST display a "Tasks & Todos" module card on the dashboard with active todo count
 - **FR-001**: System MUST allow authenticated family members to create new todo items with a text description
 - **FR-002**: System MUST display all todo items for the authenticated user's family in a list view
 - **FR-003**: System MUST allow users to assign todo items to one or more family members from their family

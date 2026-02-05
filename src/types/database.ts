@@ -159,6 +159,47 @@ export interface CreateProviderInput {
 }
 
 /**
+ * Todo Collection Document
+ */
+export interface TodoDocument {
+  _id: ObjectId;
+  familyId: ObjectId;
+  description: string;
+  assignedMemberIds: ObjectId[];
+  completed: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+  completedAt?: Date;
+}
+
+/**
+ * Client-safe todo data
+ */
+export interface Todo {
+  id: string;
+  familyId: string;
+  description: string;
+  assignedMemberIds: string[];
+  completed: boolean;
+  createdAt: string;
+  updatedAt: string;
+  completedAt?: string;
+}
+
+/**
+ * Input types for todo operations
+ */
+export interface CreateTodoInput {
+  description: string;
+  assignedMemberIds?: string[];
+}
+
+export interface UpdateTodoInput {
+  description?: string;
+  assignedMemberIds?: string[];
+}
+
+/**
  * Server Action result types
  */
 export type ActionResult<T = void> =

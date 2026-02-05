@@ -67,6 +67,14 @@ export async function initializeIndexes() {
 
     console.log('✓ Healthcare providers indexes created');
 
+    // Todos collection indexes
+    await db.collection('todos').createIndex(
+      { familyId: 1, completed: 1, createdAt: -1 },
+      { name: 'family_completion_date_idx' }
+    );
+
+    console.log('✓ Todos indexes created');
+
     // User collection index (for Better Auth users table)
     // Better Auth manages its own indexes, but we add familyId
     await db.collection('user').createIndex(
